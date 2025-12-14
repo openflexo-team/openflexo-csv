@@ -25,7 +25,7 @@ Basically, if you need to work with CSV data in OpenFlexo, this is how you do it
 ### Installation
 
 1. Clone this repo into your OpenFlexo workspace
-2. In openflexo-dev uncomment (or add if it doesnt exist) 
+2. In openflexo-dev/settings.gradle uncomment (or add if it doesnt exist) 
  ```bash
    includeBuild '../openflexo-csv'
    ```
