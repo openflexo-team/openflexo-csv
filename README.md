@@ -303,29 +303,6 @@ There's a particularly good integration test in `BasicModel.fml` that demonstrat
 
 ---
 
-## Project Structure
-
-```
-openflexo-csv/
-├── csv-ta/                    # Main technology adapter
-│   └── src/main/java/org/openflexo/ta/csv/
-│       ├── model/             # CSV data model (Document, Row, Cell)
-│       ├── fml/               # FML integration (roles, bindings)
-│       │   └── editionaction/ # FML actions (Add*, Select*)
-│       ├── rm/                # Resource management
-│       └── CSVModelSlot.java  # Main model slot definition
-│
-├── csv-ta-test/               # Test suite
-│   └── src/test/java/
-│
-└── csv-ta-test-rc/            # Test resources
-    └── src/main/resources/
-        ├── FML/               # FML test models
-        └── CSV/               # Sample CSV files
-```
-
----
-
 ## Implementation Notes
 
 This adapter follows the same patterns as the Excel adapter (`openflexo-xlsx`). If you've worked with that, this should feel familiar.
