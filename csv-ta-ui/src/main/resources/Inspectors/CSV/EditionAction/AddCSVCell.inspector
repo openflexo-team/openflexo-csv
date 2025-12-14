@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Inspector xmlns:p="http://www.openflexo.org/pamela/"
+           id="0"
+           p:modelEntity="org.openflexo.gina.utils.FIBInspector"
+           borderLeft="0"
+           sizeAdjustment="OriginalSize"
+           controllerClassName="org.openflexo.fml.controller.FMLFIBInspectorController"
+           borderRight="0"
+           border="empty"
+           trackViewPortWidth="true"
+           font="SansSerif,0,12"
+           align="left"
+           borderBottom="0"
+           titleFont="SansSerif,0,12"
+           borderTop="0"
+           trackViewPortHeight="true"
+           layout="border"
+           name="Inspector">
+
+    <Parameter id="1" name="title" value="AddCSVCell action"/>
+
+    <TabPanel id="2" name="Tab" constraints="border(location=center)">
+        <Tab id="3"
+             verticalScrollbarPolicy="VERTICAL_SCROLLBAR_AS_NEEDED"
+             borderLeft="0"
+             sizeAdjustment="OriginalSize"
+             border="empty"
+             borderRight="0"
+             trackViewPortWidth="true"
+             index="0"
+             font="SansSerif,0,11"
+             align="left"
+             borderBottom="0"
+             titleFont="SansSerif,0,11"
+             borderTop="0"
+             trackViewPortHeight="true"
+             horizontalScrollbarPolicy="HORIZONTAL_SCROLLBAR_AS_NEEDED"
+             useScrollBar="true"
+             title="Basic"
+             layout="twocols"
+             name="BasicTab">
+
+            <!-- Row binding -->
+            <Label id="10"
+                   name="RowLabel"
+                   index="10"
+                   align="left"
+                   constraints="twocols(expandHorizontally=true;expandVertically=false;index=2;insetsBottom=0;insetsLeft=2;insetsRight=2;insetsTop=5;location=left)"
+                   label="row"/>
+            <Custom id="11"
+                    manageDynamicModel="true"
+                    dataClassForComponent="org.openflexo.connie.DataBinding"
+                    componentClassName="org.openflexo.gina.swing.utils.BindingSelector"
+                    name="AddCellRowCC"
+                    data="data.row"
+                    index="11"
+                    constraints="twocols(anchor=center;expandHorizontally=true;expandVertically=false;fill=horizontal;gridHeight=1;gridWidth=1;gridX=-1;gridY=-1;index=3;insetsBottom=0;insetsLeft=2;insetsRight=2;insetsTop=0;location=right;padX=0;padY=0;weightX=1.0;weightY=0.0)">
+                <Assignment id="12"
+                            mandatory="true"
+                            value="data"
+                            variable="component.bindable"/>
+            </Custom>
+
+            <!-- Column index binding -->
+            <Label id="16"
+                   name="ColumnIndexLabel"
+                   index="14"
+                   align="right"
+                   constraints="twocols(expandHorizontally=true;expandVertically=false;index=6;insetsBottom=0;insetsLeft=2;insetsRight=2;insetsTop=5;location=left)"
+                   label="column_index"/>
+            <Custom id="17"
+                    manageDynamicModel="true"
+                    dataClassForComponent="org.openflexo.connie.DataBinding"
+                    componentClassName="org.openflexo.gina.swing.utils.BindingSelector"
+                    name="CustomSelector2"
+                    data="data.columnIndex"
+                    index="15"
+                    constraints="twocols(expandHorizontally=true;expandVertically=false;index=5;insetsBottom=0;insetsLeft=2;insetsRight=2;insetsTop=0;location=right)">
+                <Assignment id="18"
+                            mandatory="true"
+                            value="data"
+                            variable="component.bindable"/>
+            </Custom>
+
+            <!-- Value binding -->
+            <Label id="23"
+                   name="ValueLabel"
+                   index="20"
+                   align="right"
+                   constraints="twocols(expandHorizontally=true;expandVertically=false;index=7;insetsBottom=0;insetsLeft=2;insetsRight=2;insetsTop=5;location=left)"
+                   label="value"/>
+            <Custom id="24"
+                    manageDynamicModel="true"
+                    dataClassForComponent="org.openflexo.connie.DataBinding"
+                    componentClassName="org.openflexo.gina.swing.utils.BindingSelector"
+                    name="CustomSelector3"
+                    data="data.value"
+                    index="21"
+                    constraints="twocols(expandHorizontally=true;expandVertically=false;index=7;insetsBottom=0;insetsLeft=2;insetsRight=2;insetsTop=0;location=right)">
+                <Assignment id="25"
+                            mandatory="true"
+                            value="data"
+                            variable="component.bindable"/>
+            </Custom>
+        </Tab>
+    </TabPanel>
+
+    <FIBVariable id="26"
+                 name="data"
+                 type="org.openflexo.ta.csv.fml.editionaction.AddCSVCell"/>
+
+    <LocalizedDictionary id="27">
+        <Localized id="28" value="Avancé" lang="French" key="Advanced"/>
+        <Localized id="29" value="Basique" lang="French" key="Basic"/>
+        <Localized id="30" value="ligne" lang="French" key="row"/>
+        <Localized id="31" value="index de colonne" lang="French" key="column_index"/>
+        <Localized id="32" value="valeur" lang="French" key="value"/>
+    </LocalizedDictionary>
+</Inspector>

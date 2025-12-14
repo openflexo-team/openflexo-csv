@@ -1,0 +1,6 @@
+process_id,process_name,process_version,printer_model,material_type,layer_height,nozzle_diameter,print_speed,infill_density,support_enabled,estimated_time,created_date,created_by
+PROC001,Standard PLA Print,1.0,Prusa i3 MK3S,PLA,0.2,0.4,50,20,FALSE,7200,2024-12-04T09:00:00,john.doe@fablab.com
+PROC002,High Quality PETG Print,1.0,Prusa i3 MK3S,PETG,0.15,0.4,40,25,TRUE,10800,2024-12-04T09:30:00,jane.smith@fablab.com
+PROC003,Fast Prototype Print,1.0,Ender 3 V2,PLA,0.3,0.4,80,15,FALSE,3600,2024-12-04T10:00:00,bob.wilson@fablab.com
+PROC004,Flexible TPU Print,1.0,Prusa i3 MK3S,TPU,0.2,0.4,25,10,FALSE,14400,2024-12-04T10:30:00,alice.johnson@fablab.com
+PROC005,ABS Engineering Print,1.2,Prusa i3 MK3S,ABS,0.2,0.4,45,30,TRUE,9000,2024-12-04T11:00:00,charlie.brown@fablab.com

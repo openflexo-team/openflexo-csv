@@ -1,0 +1,11 @@
+dependencies {
+  implementation flexoFoundation()
+  implementation flexoOntology()
+  implementation("org.apache.commons:commons-csv:1.14.1")
+
+  testImplementation testUtils()
+  testImplementation flexoFoundationTest()
+
+
+}
+

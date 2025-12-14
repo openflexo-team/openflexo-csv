@@ -1,0 +1,436 @@
+use org.openflexo.ta.csv.CSVModelSlot as CSV;
+        use org.openflexo.foundation.fml.rt.FMLRTModelSlot as FMLRT;
+
+import org.openflexo.ta.csv.model.CSVDocument;
+import org.openflexo.ta.csv.model.CSVRow;
+
+import java.lang.String;
+import java.lang.Integer;
+import java.util.Map;
+import java.lang.Object;
+import java.util.List;
+import java.util.Comparator;
+import java.util.Collections;
+import java.util.HashMap;
+import java.lang.String;
+import java.lang.Integer;
+import java.lang.Object;
+import java.util.List;
+
+
+@URI("http://openflexo.org/test/csv/FML/TestCSVVM.fml")
+public model TestCSVVM {
+
+    public CSVDocument logData with CSVModelSlot();
+    public List<PrinterAction> actionsInstances = new ArrayList<>();
+
+    create(required Resource<CSVDocument> resource) {
+        connect logData using parameters.resource ;
+
+        }
+    public concept PrinterAction {
+
+        public CSVRow actionRow;
+        public String timeStamp;
+        public String actionP;
+
+        public Integer sequenceId ;
+
+        create(CSVRow row) {
+            this.actionRow = parameters.row;
+            this.timeStamp = this.actionRow.getCellAt(0).value;
+            this.actionP = this.actionRow.getCellAt(1).value;
+            this.sequenceId = this.actionRow.rowIndex+1;
+            actionsInstances.add(this);
+            log "" + sequenceId + ": " + actionP + "@ " + timeStamp + "";
+        }
+        delete(){}
+
+
+        public String toString() {
+            return "" + sequenceId + ": " + actionP + "@ " + timeStamp + "";
+        }
+    }
+    public void testGetDocIndexed(){
+        CSVRow row = this.logData.row_3;
+        log "does this work ? " + row ;
+
+    }
+        public void assignRow(CSVRow row){
+            CSVRow tmpRow = parameters.row;
+            String timeStamp = row.getCellAt(0).value;
+            String actionP= row.getCellAt(1).value;
+            Integer sequenceId = tmpRow.rowIndex ;
+            log "Assined vars seqId :" + sequenceId + ":  Action " + actionP + "@TimeStamp " + timeStamp + "";
+        }
+        public void getActions(){
+            log "Actions Stored in the actions List : \n";
+        for(PrinterAction ac : actionsInstances){
+            log " Action : " + ac.toString();
+
+        }
+
+        }
+
+
+        public void loadPrinterLogs() {
+        Integer size = logData.rows.size();
+        log "logData Size = " + size;
+            for (int i = 0 ; i< size  ;i++)  {
+                CSVRow tmp  = logData.getRowAt(i);
+                if (tmp.rowIndex > -1) {
+                    log "inside here with row :" +tmp;
+                    new PrinterAction(tmp);
+                    log " after here ";
+                }
+            }
+            log "Loaded " + (logData.rowCount - 1) + " printer actions";
+
+        }
+//========================================================================================================================================
+
+/**
+ * Abstract concept representing a rooted graph structure
+ */
+public abstract concept RootedGraph {
+abstract List<Object> roots();
+abstract List<Object> neighbors(Object vertex);
+
+create() {
+}
+delete() {
+}
+   }
+
+/**
+ * Abstract concept for executable actions
+ */
+public abstract concept Action {
+abstract List<Object> execute(Object config);
+create() {
+}
+delete() {
+}
+   }
+
+/**
+ * Abstract callback concept for state entry events
+ */
+public abstract concept OnEntryCallback {
+abstract boolean onEntry(Object state, Map<String,Object> opaqueData);
+   }
+
+
+//========================================================================================================================================
+/**
+ * Dictionary-based implementation of RootedGraph
+ */
+public concept DictionaryGraph extends RootedGraph {
+    private Map<Object,List<Object>> graph;
+    private List<Object> roots;
+
+    create() {
+        this.graph = new HashMap<>();
+        this.roots = new ArrayList<>();
+    }
+
+    create(List<Object> roots, Map<Object,List<Object>> graph) {
+        this.graph = parameters.graph;
+        this.roots = parameters.roots;
+    }
+
+    delete() {
+    }
+
+    public List<Object> roots() {
+        List<Object> returnList = new ArrayList<>();
+        for (Object root : this.roots) {
+            returnList.add(root);
+        }
+        return returnList;
+    }
+
+    public List<Object> neighbors(Object vertex) {
+        List<Object> returnList = graph.getOrDefault(parameters.vertex,new ArrayList<>());
+        return returnList;
+    }
+    public void logRootAndNeighbors(){
+        log "Logging Roots and neighbors for : ";
+        List<Object> rootList = this.roots();
+        List<Object> neighList = this.neighbors();
+
+            if (rootList == null){
+                log "ROOT EMPTY ";
+            }
+            if (neighList == null){
+                log "NEIGHBORS EMPTY ";
+            }
+
+
+        for (Object root : rootList) {
+            log "Root" + root;
+        }
+        for(Object nei:neighList){
+            log "Neighbor" + nei;
+        }
+
+    }
+
+}
+/**
+ * Wrapper for RootedGraph that tracks parent relationships during traversal
+ */
+public concept ParentTracer extends RootedGraph {
+    private RootedGraph operand with ConceptInstance();
+    private Map<Object,List<Object>> parents;
+
+    create(RootedGraph graph) {
+        this.operand = parameters.graph;
+        this.parents = null; //change later with new HashMap<>();
+    }
+
+    delete() {
+    }
+
+    public List<Object> roots() {
+        List<Object> roots = this.operand.roots();
+        for (Object r : roots) {
+            parents.put(r,new ArrayList<>());
+        }
+        return roots;
+    }
+
+    public List<Object> getOpRoots() {
+        List<Object> res = this.operand.roots();
+        return res;
+    }
+
+    public List<Object> getOpNeighbors(Object vertex) {
+        List<Object> neighbors = this.operand.neighbors(parameters.vertex);
+        return neighbors;
+    }
+
+    public List<Object> neighbors(Object vertex) {
+        List<Object> neighbors = this.operand.neighbors(parameters.vertex);
+        for (Object n : neighbors) {
+            if (!parents.containsKey(n)) {
+                List<Object> parentList = new ArrayList<>();
+                parentList.add(parameters.vertex);
+                parents.put(n,parentList);
+            }
+        }
+        return neighbors;
+    }
+
+    public Map<Object,List<Object>> getParents() {
+        return parents;
+    }
+}
+//========================================================================================================================================
+/**
+ * Result container for search operations
+ */
+public concept SearchResult {
+public Object state;
+public boolean found;
+
+create(Object stateCtr, boolean foundCtr) {
+    this.state = parameters.stateCtr;
+    this.found = parameters.foundCtr;
+}
+
+delete() {
+}
+   }
+
+/**
+ * Callback to find a specific action by name
+ */
+public concept FindAction extends OnEntryCallback {
+    private String targetAction;
+
+    create(String act) {
+        this.targetAction = parameters.act;
+    }
+
+    delete() {
+    }
+
+    public boolean onEntry(Object state, Map<String,Object> opaqueData) {
+        //should add a type checker here but still don't know how ?
+        PrinterAction pa = (PrinterAction)parameters.state;
+        log "Checking : " + pa.actionP + " == " + targetAction;
+        return pa.actionP.equals(targetAction);
+    }
+}
+
+/**
+ * Callback to find a specific action by sequence ID
+ */
+public concept FindSequenceId extends OnEntryCallback {
+    private Integer targetId;
+
+    create(int id) {
+        this.targetId = parameters.id;
+    }
+
+    delete() {
+    }
+
+    public boolean onEntry(Object state, Map<String,Object> opaqueData) {
+        //should add a type checker here but still don't know how ?
+        PrinterAction pa = (PrinterAction)parameters.state;
+        return pa.sequenceId.equals(targetId);
+    }
+}
+
+//========================================================================================================================================
+/**
+ * Sort printer actions by sequence ID using selection sort
+ */
+public List<PrinterAction> sortPrinterActions(List<PrinterAction> inputList) {
+    // 1. Create a result list
+    List<PrinterAction> sortedList = new ArrayList<>();
+
+    // 2. Create a temporary copy of the input list
+    List<PrinterAction> tempSource = new ArrayList<>();
+    for (PrinterAction p : parameters.inputList) {
+        tempSource.add(p);
+    }
+
+    // 3. Selection Sort (Find Minimum and Move)
+    while (tempSource.size() > 0) {
+        PrinterAction smallestAction = null;
+
+        // Find the item with the lowest sequenceId
+        for (PrinterAction candidate : tempSource) {
+            if (smallestAction == null) {
+                smallestAction = candidate;
+            }
+            else {
+                if (candidate.sequenceId.compareTo(smallestAction.sequenceId) < 0) {
+                    smallestAction = candidate;
+                }
+            }
+        }
+
+        // 4. Move the smallest item we found
+        sortedList.add(smallestAction);
+        tempSource.remove(smallestAction);
+    }
+
+    return sortedList;
+}
+//========================================================================================================================================
+/**
+ * Build a sequential graph from printer actions
+ */
+public DictionaryGraph buildSequentialGraph() {
+    List<PrinterAction> actions = new ArrayList<>();
+    for (PrinterAction action : actionsInstances) { //change later to get the current instances of the PrinterActions
+        actions.add(action);
+    }
+
+    this.sortPrinterActions(actions);
+    log "sorted data";
+    for (PrinterAction action : actions) {
+        log "Action Sort" + action;
+    }
+    Map<Object,List<Object>> graph = new HashMap<>(); // change later to init an actual hashmap
+    List<Object> roots = new ArrayList<>();
+
+    if (!actions.isEmpty()) {
+        roots.add(actions.get(0));
+        Integer i = 0;
+
+        //cuz the last action will have no neighbors (unless there's a cycle we'll have to look into that later)
+        graph.put(actions.get(actions.size() - 1),new ArrayList<>());
+    }
+
+    DictionaryGraph seqGraph = new DictionaryGraph(roots,graph);
+    log "Sequential graph built with " + actions.size() + " nodes";
+
+    return seqGraph;
+}
+//========================================================================================================================================
+/**
+ * Breadth-first search on a RootedGraph with callback
+ */
+public SearchResult searchRG(RootedGraph graph, OnEntryCallback onEntry) {
+    log "WE IN ================";
+    Set<Object> known = new HashSet<>();
+    Deque<Object> frontier = new ArrayDeque<>();
+    Map<String,Object> opaqueData = new HashMap<>(); //change later with new HashMap<>()
+
+    for (Object r : parameters.graph.roots()) {
+        if (!known.contains(r)) {
+            log "this is the first Condition : " + parameters.onEntry.onEntry(r,opaqueData);
+            if (parameters.onEntry.onEntry(r,opaqueData)) {
+                log "First sortie : " + r;
+                return new SearchResult(r,true);
+            }
+            known.add(r);
+            frontier.add(r);
+        }
+    }
+
+    while (!frontier.isEmpty()) {
+        Object curr = frontier.removeFirst();
+        for (Object n : parameters.graph.neighbors(curr)) {
+            if (!known.contains(n)) {
+                log "this is the second Condition : " + parameters.onEntry.onEntry(n,opaqueData);
+
+                if (parameters.onEntry.onEntry(n,opaqueData)) {
+                    log "Second sortie : " + n;
+                    return new SearchResult(n,true);
+                }
+                known.add(n);
+                frontier.add(n);
+            }
+        }
+    }
+
+    log "default sortie : null ";
+    return new SearchResult(null,false);
+}
+//========================================================================================================================================
+/**
+ * Reconstruct path from roots to target using parent tracer
+ */
+public List<Object> reconstructPath(ParentTracer tracer, Object target) {
+    Map<Object,List<Object>> parents = parameters.tracer.getParents();
+
+    if (!parents.containsKey(parameters.target)) {
+        return new ArrayList<>();
+    }
+
+    List<Object> path = new ArrayList<>();
+    path.add(parameters.target);
+    this.buildPath(path,parameters.target,parents);
+
+    // Collections.reverse(path); //(uncomment this line in tests)
+    return path;
+}
+
+/**
+ * Recursively build path by traversing parent relationships
+ */
+public int buildPath(List<Object> path, Object current, Map<Object,List<Object>> parents) {
+    if (!parameters.parents.containsKey(parameters.current)) {
+        return 0;
+    }
+
+    List<Object> parentList = parameters.parents.getOrDefault(parameters.current,new ArrayList<>());
+    if (parentList == null || parentList.isEmpty()) {
+        return 0;
+    }
+
+    for (Object parent : parentList) {
+        parameters.path.add(parent);
+        this.buildPath(parameters.path,parent,parameters.parents);
+    }
+}
+//========================================================================================================================================
+delete(){}
+
+}

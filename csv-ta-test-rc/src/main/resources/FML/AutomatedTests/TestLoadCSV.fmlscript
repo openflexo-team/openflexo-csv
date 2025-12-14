@@ -1,0 +1,18 @@
+service ResourceCenterService status;
+resources;
+context;
+
+csvDoc = load -r ["http://www.openflexo.org/test/csv/TestResourceCenter/CSV/MockData.csv"];
+log "csvDoc=" + csvDoc;
+assert csvDoc != null;
+
+assert csvDoc.rows.size() > 0;
+log "Number of rows: " + csvDoc.rows.size();
+
+firstRow = csvDoc.rows.get(0);
+assert firstRow != null;
+log "First row: " + firstRow;
+
+firstCell = firstRow.cells.get(0);
+assert firstCell != null;
+log "First cell value: " + firstCell.value;

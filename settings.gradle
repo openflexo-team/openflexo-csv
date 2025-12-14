@@ -1,0 +1,3 @@
+rootProject.name = 'openflexo-csv'
+
+include 'csv-ta','csv-ta-ui','csv-ta-test', 'csv-ta-test-rc'

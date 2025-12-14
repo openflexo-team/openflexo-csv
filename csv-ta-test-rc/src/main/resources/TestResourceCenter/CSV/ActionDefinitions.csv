@@ -1,0 +1,26 @@
+action_id,action_name,action_category,bpmn_type,description,is_async,requires_confirmation,error_code,estimated_duration
+ACT_START,Start Process,Control,StartEvent,Initialize the printing process,FALSE,FALSE,ERR_INIT_001,5
+ACT_INIT_HARDWARE,Initialize Hardware,System,ServiceTask,Check and initialize printer hardware components,TRUE,FALSE,ERR_HARDWARE_001,30
+ACT_HEAT_BED,Heat Print Bed,Thermal,ServiceTask,Heat the print bed to target temperature,TRUE,FALSE,ERR_THERMAL_001,300
+ACT_HEAT_NOZZLE,Heat Nozzle,Thermal,ServiceTask,Heat the nozzle to target temperature,TRUE,FALSE,ERR_THERMAL_002,240
+ACT_WAIT_TEMP,Wait for Temperature,Thermal,IntermediateEvent,Wait until all temperatures are reached,FALSE,FALSE,ERR_THERMAL_003,60
+ACT_AUTO_LEVEL,Auto-Level Bed,Calibration,ServiceTask,Perform automatic bed leveling with probe,TRUE,FALSE,ERR_LEVEL_001,120
+ACT_LOAD_FILAMENT,Load Filament,Material,UserTask,Prompt user to load filament into extruder,FALSE,TRUE,ERR_FILAMENT_001,60
+ACT_HOME_AXES,Home All Axes,Movement,ServiceTask,Move all axes to home position,TRUE,FALSE,ERR_MOVEMENT_001,45
+ACT_MOVE_TO_START,Move to Start Position,Movement,ServiceTask,Move print head to start position,TRUE,FALSE,ERR_MOVEMENT_002,15
+ACT_START_PRINT,Start Printing,Control,ServiceTask,Begin the actual printing process,TRUE,FALSE,ERR_PRINT_001,5
+ACT_PRINT_LAYER,Print Layer,Printing,ServiceTask,Execute G-code for current layer,TRUE,FALSE,ERR_PRINT_002,180
+ACT_MOVE_Z,Move Z-Axis,Movement,ServiceTask,Raise Z-axis for next layer,TRUE,FALSE,ERR_MOVEMENT_003,3
+ACT_CHECK_SENSORS,Check Sensors,Monitoring,ServiceTask,Verify all sensor readings are in range,TRUE,FALSE,ERR_SENSOR_001,5
+ACT_PAUSE_PRINT,Pause Print,Control,IntermediateEvent,Pause the printing process,FALSE,TRUE,ERR_CONTROL_001,2
+ACT_RESUME_PRINT,Resume Print,Control,ServiceTask,Resume the paused print,TRUE,FALSE,ERR_CONTROL_002,5
+ACT_FINISH_PRINT,Finish Print,Control,ServiceTask,Complete the printing process,TRUE,FALSE,ERR_PRINT_003,10
+ACT_COOL_DOWN,Cool Down,Thermal,ServiceTask,Cool down bed and nozzle to safe temperature,TRUE,FALSE,ERR_THERMAL_004,600
+ACT_UNLOAD_FILAMENT,Unload Filament,Material,UserTask,Prompt user to unload filament,FALSE,TRUE,ERR_FILAMENT_002,60
+ACT_PARK_HEAD,Park Print Head,Movement,ServiceTask,Move print head to park position,TRUE,FALSE,ERR_MOVEMENT_004,10
+ACT_END,End Process,Control,EndEvent,Finalize and end the printing process,FALSE,FALSE,ERR_END_001,5
+ACT_GATEWAY_TEMP_CHECK,Temperature Check Gateway,Control,Gateway_Exclusive,Check if temperatures are acceptable,FALSE,FALSE,ERR_GATEWAY_001,1
+ACT_GATEWAY_PARALLEL_HEAT,Parallel Heating Gateway,Control,Gateway_Parallel,Start parallel heating of bed and nozzle,FALSE,FALSE,ERR_GATEWAY_002,1
+ACT_ERROR_HANDLER,Handle Error,Error,ErrorEvent,Handle printing errors and attempt recovery,FALSE,FALSE,ERR_HANDLER_001,30
+ACT_RETRACT_FILAMENT,Retract Filament,Printing,ServiceTask,Retract filament to prevent stringing,TRUE,FALSE,ERR_PRINT_004,2
+ACT_PRIME_NOZZLE,Prime Nozzle,Printing,ServiceTask,Prime nozzle with small extrusion,TRUE,FALSE,ERR_PRINT_005,10

@@ -1,0 +1,42 @@
+action_id,parameter_name,parameter_type,default_value,min_value,max_value,unit,is_required,description
+ACT_HEAT_BED,target_temperature,float,60.0,0.0,120.0,celsius,TRUE,Target temperature for the print bed
+ACT_HEAT_BED,tolerance,float,2.0,0.5,5.0,celsius,FALSE,Acceptable temperature tolerance
+ACT_HEAT_BED,timeout,integer,600,60,1200,seconds,FALSE,Maximum time to reach temperature
+ACT_HEAT_NOZZLE,target_temperature,float,210.0,0.0,300.0,celsius,TRUE,Target temperature for the nozzle
+ACT_HEAT_NOZZLE,tolerance,float,2.0,0.5,5.0,celsius,FALSE,Acceptable temperature tolerance
+ACT_HEAT_NOZZLE,timeout,integer,480,60,900,seconds,FALSE,Maximum time to reach temperature
+ACT_WAIT_TEMP,max_wait_time,integer,120,30,600,seconds,FALSE,Maximum time to wait for temperature stabilization
+ACT_AUTO_LEVEL,probe_points,integer,9,4,25,count,FALSE,Number of probe points for bed leveling
+ACT_AUTO_LEVEL,z_offset,float,0.0,-2.0,2.0,millimeters,FALSE,Z-axis offset adjustment
+ACT_LOAD_FILAMENT,filament_type,string,PLA,,,material,TRUE,Type of filament being loaded
+ACT_LOAD_FILAMENT,confirmation_timeout,integer,300,60,600,seconds,FALSE,Time to wait for user confirmation
+ACT_HOME_AXES,home_x,boolean,TRUE,,,flag,FALSE,Home X-axis
+ACT_HOME_AXES,home_y,boolean,TRUE,,,flag,FALSE,Home Y-axis
+ACT_HOME_AXES,home_z,boolean,TRUE,,,flag,FALSE,Home Z-axis
+ACT_HOME_AXES,speed,integer,3000,1000,5000,mm_per_min,FALSE,Homing speed
+ACT_MOVE_TO_START,x_position,float,10.0,0.0,250.0,millimeters,TRUE,X-axis start position
+ACT_MOVE_TO_START,y_position,float,10.0,0.0,210.0,millimeters,TRUE,Y-axis start position
+ACT_MOVE_TO_START,z_position,float,0.3,0.1,10.0,millimeters,TRUE,Z-axis start position
+ACT_MOVE_TO_START,speed,integer,6000,1000,10000,mm_per_min,FALSE,Movement speed
+ACT_PRINT_LAYER,layer_number,integer,1,1,10000,count,TRUE,Current layer number being printed
+ACT_PRINT_LAYER,gcode_file,string,layer.gcode,,,filename,TRUE,G-code file for the layer
+ACT_PRINT_LAYER,speed_multiplier,float,1.0,0.5,2.0,factor,FALSE,Speed adjustment factor
+ACT_MOVE_Z,distance,float,0.2,0.05,1.0,millimeters,TRUE,Distance to move Z-axis up
+ACT_MOVE_Z,speed,integer,300,100,1000,mm_per_min,FALSE,Z-axis movement speed
+ACT_CHECK_SENSORS,check_temperature,boolean,TRUE,,,flag,FALSE,Check temperature sensors
+ACT_CHECK_SENSORS,check_filament,boolean,TRUE,,,flag,FALSE,Check filament sensor
+ACT_CHECK_SENSORS,check_endstops,boolean,TRUE,,,flag,FALSE,Check endstop sensors
+ACT_PAUSE_PRINT,reason,string,user_requested,,,text,FALSE,Reason for pausing the print
+ACT_PAUSE_PRINT,park_head,boolean,TRUE,,,flag,FALSE,Move head to park position when paused
+ACT_COOL_DOWN,bed_target,float,30.0,0.0,50.0,celsius,FALSE,Target temperature for bed cooldown
+ACT_COOL_DOWN,nozzle_target,float,50.0,0.0,100.0,celsius,FALSE,Target temperature for nozzle cooldown
+ACT_COOL_DOWN,timeout,integer,900,300,1800,seconds,FALSE,Maximum cooldown time
+ACT_UNLOAD_FILAMENT,retract_distance,float,100.0,50.0,200.0,millimeters,FALSE,Distance to retract filament
+ACT_UNLOAD_FILAMENT,confirmation_timeout,integer,300,60,600,seconds,FALSE,Time to wait for user confirmation
+ACT_PARK_HEAD,x_position,float,0.0,0.0,250.0,millimeters,FALSE,X-axis park position
+ACT_PARK_HEAD,y_position,float,210.0,0.0,210.0,millimeters,FALSE,Y-axis park position
+ACT_PARK_HEAD,z_position,float,200.0,100.0,250.0,millimeters,FALSE,Z-axis park position
+ACT_RETRACT_FILAMENT,distance,float,5.0,1.0,10.0,millimeters,TRUE,Retraction distance
+ACT_RETRACT_FILAMENT,speed,integer,1800,600,3600,mm_per_min,FALSE,Retraction speed
+ACT_PRIME_NOZZLE,extrusion_length,float,15.0,5.0,30.0,millimeters,TRUE,Length of filament to extrude for priming
+ACT_PRIME_NOZZLE,speed,integer,300,100,600,mm_per_min,FALSE,Extrusion speed

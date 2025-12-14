@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Panel className="org.openflexo.gina.utils.FIBInspector"
+       layout="border"
+       titleFont="SansSerif,0,12"
+       darkLevel="0"
+       dataClassName="org.openflexo.ta.csv.model.CSVRow"
+       controllerClassName="org.openflexo.inspector.FIBInspectorController"
+       font="SansSerif,0,12"
+       name="Inspector">
+
+    <TabPanel name="Tab" constraints="border(location=center)">
+        <Tab title="Basic"
+             layout="twocols"
+             titleFont="SansSerif,0,11"
+             darkLevel="0"
+             index="0"
+             font="SansSerif,0,11"
+             useScrollBar="true"
+             horizontalScrollbarPolicy="HORIZONTAL_SCROLLBAR_AS_NEEDED"
+             verticalScrollbarPolicy="VERTICAL_SCROLLBAR_AS_NEEDED"
+             name="BasicTab">
+
+            <!-- Row index -->
+            <Label label="row_index"
+                   index="0"
+                   constraints="twocols(expandHorizontally=false;expandVertically=false;index=0;location=left)"
+                   name="RowIndexLabel"
+                   localize="true"/>
+            <Number index="1"
+                    data="data.rowIndex"
+                    constraints="twocols(expandHorizontally=false;expandVertically=false;index=1;location=right)"
+                    name="RowIndex"
+                    readOnly="true"
+                    numberType="IntegerType"
+                    columns="5"/>
+
+            <!-- Cell count -->
+            <Label label="cell_count"
+                   index="2"
+                   constraints="twocols(expandHorizontally=false;expandVertically=false;index=2;location=left)"
+                   name="CellCountLabel"
+                   localize="true"/>
+            <Number index="3"
+                    data="data.cellCount"
+                    constraints="twocols(expandHorizontally=false;expandVertically=false;index=3;location=right)"
+                    name="CellCount"
+                    readOnly="true"
+                    numberType="IntegerType"
+                    columns="5"/>
+
+            <!-- Parent document -->
+            <Label label="document"
+                   index="4"
+                   constraints="twocols(expandHorizontally=false;expandVertically=false;index=4;location=left)"
+                   name="DocumentLabel"
+                   localize="true"/>
+            <TextField index="5"
+                       data="data.csvDocument"
+                       constraints="twocols(expandHorizontally=true;expandVertically=false;index=5;location=right)"
+                       name="Document"
+                       readOnly="true"
+                       localize="true"
+                       columns="15"/>
+        </Tab>
+    </TabPanel>
+
+    <LocalizedDictionary>
+        <Localized key="Basic" lang="French" value="Basique"/>
+        <Localized key="row_index" lang="French" value="index de ligne"/>
+        <Localized key="cell_count" lang="French" value="nombre de cellules"/>
+        <Localized key="document" lang="French" value="document"/>
+    </LocalizedDictionary>
+
+    <Parameter name="title" value="CSV Row"/>
+</Panel>

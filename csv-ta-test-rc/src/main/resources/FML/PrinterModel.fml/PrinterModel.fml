@@ -1,0 +1,746 @@
+use org.openflexo.ta.csv.CSVModelSlot as CSV;
+        use org.openflexo.foundation.fml.rt.FMLRTModelSlot as FMLRT;
+
+import org.openflexo.ta.csv.model.CSVDocument;
+import org.openflexo.ta.csv.model.CSVRow;
+
+import java.lang.String;
+import java.lang.Integer;
+import java.util.Map;
+import java.lang.Object;
+import java.util.List;
+import java.util.Comparator;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.Deque;
+import java.util.ArrayDeque;
+
+@URI("http://openflexo.org/test/csv/FML/PrinterModel.fml")
+public model PrinterModel {
+
+
+public CSVDocument sequenceData with CSVModelSlot();
+
+
+public CSVDocument actionDefinitions with CSVModelSlot();
+
+
+public List<PrinterAction> actionsInstances = new ArrayList<>();
+
+
+public String currentSequenceId;
+public String currentState;
+public Integer currentStepNumber;
+
+/**
+ * Constructor - connects to CSV resource
+ *
+ * Usage:
+ *   csv = load -r ["http:
+ *   vm = new TestCSVVM(csv.resource) with (name="workflow1");
+ */
+create(required Resource<CSVDocument> resource) {
+    connect sequenceData using parameters.resource;
+    this.currentSequenceId = "";
+    this.currentState = "IDLE";
+    this.currentStepNumber = 0;
+    log "TestCSVVM initialized with " + sequenceData.rows.size() + " sequence steps";
+}
+
+/**
+ * Optional constructor with action definitions
+ */
+create(required Resource<CSVDocument> sequenceResource,
+       required Resource<CSVDocument> definitionsResource) {
+    connect sequenceData using parameters.sequenceResource;
+    connect actionDefinitions using parameters.definitionsResource;
+    this.currentSequenceId = "";
+    this.currentState = "IDLE";
+    this.currentStepNumber = 0;
+    log "TestCSVVM initialized with sequences and definitions";
+}
+
+
+
+
+
+/**
+ * Represents a single step in the 3D printer workflow
+ * Maps to one row in PrinterActionSequence.csv
+ */
+public concept PrinterAction {
+
+public CSVRow actionRow;
+
+
+public String sequenceId;
+public Integer stepNumber;
+public String actionId;
+public String actionType;
+public String timestamp;
+public Integer durationSeconds;
+public String stateBefore;
+public String stateAfter;
+public String gatewayType;
+public String condition;
+public String isCritical;
+public Integer retryCount;
+public String status;
+
+/**
+ * Create PrinterAction from CSV row
+ */
+create(CSVRow row) {
+    this.actionRow = parameters.row;
+
+
+    this.sequenceId = this.actionRow.getCellAt(0).value;
+    this.stepNumber = Integer.parseInt(this.actionRow.getCellAt(1).value);
+    this.actionId = this.actionRow.getCellAt(2).value;
+    this.actionType = this.actionRow.getCellAt(3).value;
+    this.timestamp = this.actionRow.getCellAt(4).value;
+    this.durationSeconds = Integer.parseInt(this.actionRow.getCellAt(5).value);
+    this.stateBefore = this.actionRow.getCellAt(6).value;
+    this.stateAfter = this.actionRow.getCellAt(7).value;
+    this.gatewayType = this.actionRow.getCellAt(8).value;
+    this.condition = this.actionRow.getCellAt(9).value;
+    this.isCritical = this.actionRow.getCellAt(10).value;
+    this.retryCount = Integer.parseInt(this.actionRow.getCellAt(11).value);
+    this.status = this.actionRow.getCellAt(12).value;
+
+
+    actionsInstances.add(this);
+
+    log "Loaded: " + sequenceId + " Step " + stepNumber + ": " + actionId +
+            " (" + stateBefore + " → " + stateAfter + ")";
+}
+
+delete() {}
+
+/**
+ * Check if this action is part of a parallel gateway
+ */
+public boolean isParallelExecution() {
+    return this.gatewayType != null && this.gatewayType.equals("Parallel");
+}
+
+/**
+ * Check if this is a critical step
+ */
+public boolean isCriticalStep() {
+    return this.isCritical != null && this.isCritical.equals("TRUE");
+}
+
+/**
+ * Check if action is complete
+ */
+public boolean isCompleted() {
+    return this.status != null && this.status.equals("COMPLETED");
+}
+
+/**
+ * Check if action is a BPMN gateway
+ */
+public boolean isGateway() {
+    return this.actionType != null &&
+            (this.actionType.contains("Gateway") || this.actionType.contains("gateway"));
+}
+
+/**
+ * Check if this is a user task (requires human interaction)
+ */
+public boolean isUserTask() {
+    return this.actionType != null && this.actionType.equals("UserTask");
+}
+
+/**
+ * String representation for logging
+ */
+public String toString() {
+    return "Step " + stepNumber + " [" + actionType + "]: " + actionId +
+            " :(TS): " + timestamp + " (" + stateBefore + " → " + stateAfter + ")";
+}
+
+/**
+ * Short representation
+ */
+public String toShortString() {
+    return sequenceId + "." + stepNumber + ": " + actionId;
+}
+        }
+
+
+
+
+
+/**
+ * Load all printer actions from CSV
+ */
+public void loadPrinterLogs() {
+    Integer size = sequenceData.rows.size();
+    log "Loading " + size + " sequence steps...";
+
+    Integer loadedCount = 0;
+    for (int i = 0; i < size; i++) {
+        CSVRow row = sequenceData.getRowAt(i);
+
+
+        if (row.rowIndex > -1) {
+            new PrinterAction(row);
+            loadedCount = loadedCount + 1;
+        }
+    }
+
+    log "Loaded " + loadedCount + " printer actions";
+    log "Sequences found: " + this.getUniqueSequenceIds().size();
+}
+
+/**
+ * Get all unique sequence IDs
+ */
+public List<String> getUniqueSequenceIds() {
+    List<String> sequences = new ArrayList<>();
+
+    for (PrinterAction action : actionsInstances) {
+        boolean found = false;
+        for (String seqId : sequences) {
+            if (seqId.equals(action.sequenceId)) {
+                found = true;
+            }
+        }
+        if (!found) {
+            sequences.add(action.sequenceId);
+        }
+    }
+
+    return sequences;
+}
+
+/**
+ * Get all actions for a specific sequence
+ */
+public List<PrinterAction> getActionsForSequence(String sequenceId) {
+    List<PrinterAction> result = new ArrayList<>();
+
+    for (PrinterAction action : actionsInstances) {
+        if (action.sequenceId.equals(parameters.sequenceId)) {
+            result.add(action);
+        }
+    }
+
+    return result;
+}
+
+/**
+ * Get actions by state
+ */
+public List<PrinterAction> getActionsByState(String state) {
+    List<PrinterAction> result = new ArrayList<>();
+
+    for (PrinterAction act : actionsInstances) {
+        if (act.stateBefore.equals(parameters.state) ||
+                act.stateAfter.equals(parameters.state)) {
+            result.add(act);
+        }
+    }
+
+    return result;
+}
+
+/**
+ * Get critical actions only
+ */
+public List<PrinterAction> getCriticalActions() {
+    List<PrinterAction> result = new ArrayList<>();
+
+    for (PrinterAction action : actionsInstances) {
+        if (action.isCriticalStep()) {
+            result.add(action);
+        }
+    }
+
+    return result;
+}
+
+/**
+ * Print all loaded actions
+ */
+public void getActions() {
+    log "Actions stored in the actions list:";
+    log "Total actions: " + actionsInstances.size();
+    log "---";
+
+    for (PrinterAction ac : actionsInstances) {
+        log " → " + ac.toString();
+    }
+}
+
+/**
+ * Print summary statistics
+ */
+public void printSummary() {
+    log "=== Workflow Summary ===";
+    log "Total actions: " + actionsInstances.size();
+    log "Sequences: " + this.getUniqueSequenceIds().size();
+    log "Critical actions: " + this.getCriticalActions().size();
+
+
+    Integer pending = 0;
+    Integer running = 0;
+    Integer completed = 0;
+    Integer failed = 0;
+
+    for (PrinterAction action : actionsInstances) {
+        if (action.status.equals("PENDING")) {
+            pending = pending + 1;
+        } else if (action.status.equals("RUNNING")) {
+            running = running + 1;
+        } else if (action.status.equals("COMPLETED")) {
+            completed = completed + 1;
+        } else if (action.status.equals("FAILED")) {
+            failed = failed + 1;
+        }
+    }
+
+    log "Status breakdown:";
+    log "  PENDING: " + pending;
+    log "  RUNNING: " + running;
+    log "  COMPLETED: " + completed;
+    log "  FAILED: " + failed;
+    log "========================";
+}
+
+
+
+
+
+
+        /**
+         * Abstract concept representing a rooted graph structure
+         */
+        public abstract concept RootedGraph {
+        abstract List<Object> roots();
+        abstract List<Object> neighbors(Object vertex);
+
+        create() {}
+        delete() {}
+            }
+
+        /**
+         * Abstract concept for executable actions
+         */
+        public abstract concept Action {
+        abstract List<Object> execute(Object config);
+
+        create() {}
+        delete() {}
+            }
+
+        /**
+         * Abstract callback concept for state entry events
+         */
+        public abstract concept OnEntryCallback {
+            abstract boolean onEntry(Object state, Map<String,Object> opaqueData);
+        }
+
+
+
+
+
+/**
+ * Dictionary-based implementation of RootedGraph
+ */
+public concept DictionaryGraph extends RootedGraph {
+    private Map<Object,List<Object>> graph;
+    private List<Object> roots;
+
+    create() {
+        this.graph = new HashMap<>();
+        this.roots = new ArrayList<>();
+    }
+
+    create(List<Object> roots, Map<Object,List<Object>> graph) {
+        this.graph = parameters.graph;
+        this.roots = parameters.roots;
+    }
+
+    delete() {}
+
+    public List<Object> roots() {
+        List<Object> returnList = new ArrayList<>();
+        for (Object root : this.roots) {
+            returnList.add(root);
+        }
+        return returnList;
+    }
+
+    public List<Object> neighbors(Object vertex) {
+        List<Object> returnList = graph.getOrDefault(parameters.vertex, new ArrayList<>());
+        return returnList;
+    }
+
+    public void logRootAndNeighbors() {
+        log "=== Graph Structure ===";
+        List<Object> rootList = this.roots();
+
+        if (rootList == null || rootList.isEmpty()) {
+            log "ROOT EMPTY";
+            return;
+        }
+
+        log "Roots: " + rootList.size();
+        for (Object root : rootList) {
+            log "  Root: " + root;
+
+            List<Object> neighList = this.neighbors(root);
+            if (neighList != null && !neighList.isEmpty()) {
+                log "    Neighbors: " + neighList.size();
+                for (Object nei : neighList) {
+                    log "      → " + nei;
+                }
+            }
+        }
+        log "======================";
+    }
+}
+        /**
+         * Wrapper for RootedGraph that tracks parent relationships during traversal
+         */
+        public concept ParentTracer extends RootedGraph {
+            private RootedGraph operand with ConceptInstance();
+            private Map<Object,List<Object>> parents;
+
+            create(RootedGraph graph) {
+                this.operand = parameters.graph;
+                this.parents = new HashMap<>();
+            }
+
+            delete() {}
+
+            public List<Object> roots() {
+                List<Object> roots = this.operand.roots();
+                for (Object r : roots) {
+                    parents.put(r, new ArrayList<>());
+                }
+                return roots;
+            }
+
+            public List<Object> getOpRoots() {
+                List<Object> res = this.operand.roots();
+                return res;
+            }
+
+            public List<Object> getOpNeighbors(Object vertex) {
+                List<Object> neighbors = this.operand.neighbors(parameters.vertex);
+                return neighbors;
+            }
+
+            public List<Object> neighbors(Object vertex) {
+                List<Object> neighbors = this.operand.neighbors(parameters.vertex);
+                for (Object n : neighbors) {
+                    if (!parents.containsKey(n)) {
+                        List<Object> parentList = new ArrayList<>();
+                        parentList.add(parameters.vertex);
+                        parents.put(n, parentList);
+                    }
+                }
+                return neighbors;
+            }
+
+            public Map<Object,List<Object>> getParents() {
+                return parents;
+            }
+        }
+
+
+
+
+
+        /**
+         * Result container for search operations
+         */
+        public concept SearchResult {
+        public Object state;
+        public boolean found;
+
+        create(Object stateCtr, boolean foundCtr) {
+            this.state = parameters.stateCtr;
+            this.found = parameters.foundCtr;
+        }
+
+        delete() {}
+            }
+
+        /**
+         * Callback to find a specific action by action ID
+         */
+        public concept FindAction extends OnEntryCallback {
+            private String targetActionId;
+
+            create(String actionId) {
+                this.targetActionId = parameters.actionId;
+            }
+
+            delete() {}
+
+            public boolean onEntry(Object state, Map<String,Object> opaqueData) {
+                PrinterAction pa = (PrinterAction) parameters.state;
+                log "Checking: " + pa.actionId + " == " + targetActionId;
+                return pa.actionId.equals(targetActionId);
+            }
+        }
+
+        /**
+         * Callback to find a specific action by step number
+         */
+        public concept FindStepNumber extends OnEntryCallback {
+            private Integer targetStep;
+
+            create(int step) {
+                this.targetStep = parameters.step;
+            }
+
+            delete() {}
+
+            public boolean onEntry(Object state, Map<String,Object> opaqueData) {
+                PrinterAction pa = (PrinterAction) parameters.state;
+                return pa.stepNumber.equals(targetStep);
+            }
+        }
+
+        /**
+         * Callback to find actions by state
+         */
+        public concept FindState extends OnEntryCallback {
+            private String targetState;
+
+            create(String state) {
+                this.targetState = parameters.state;
+            }
+
+            delete() {}
+
+            public boolean onEntry(Object state, Map<String,Object> opaqueData) {
+                PrinterAction pa = (PrinterAction) parameters.state;
+                return pa.stateBefore.equals(targetState) || pa.stateAfter.equals(targetState);
+            }
+        }
+
+
+
+
+        /**
+         * Sort printer actions by step number using selection sort
+         */
+        public List<PrinterAction> sortPrinterActions(List<PrinterAction> inputList) {
+            List<PrinterAction> sortedList = new ArrayList<>();
+            List<PrinterAction> tempSource = new ArrayList<>();
+
+            for (PrinterAction p : parameters.inputList) {
+                tempSource.add(p);
+            }
+
+            while (tempSource.size() > 0) {
+                PrinterAction smallestAction = null;
+
+                for (PrinterAction candidate : tempSource) {
+                    if (smallestAction == null) {
+                        smallestAction = candidate;
+                    } else {
+                        if (candidate.stepNumber.compareTo(smallestAction.stepNumber) < 0) {
+                            smallestAction = candidate;
+                        }
+                    }
+                }
+
+                sortedList.add(smallestAction);
+                tempSource.remove(smallestAction);
+            }
+
+            return sortedList;
+        }
+
+        /**
+         * Build a sequential graph from printer actions
+         * Creates edges between consecutive steps
+         */
+        public DictionaryGraph buildSequentialGraph() {
+            List<PrinterAction> actions = new ArrayList<>();
+            for (PrinterAction action : actionsInstances) {
+                actions.add(action);
+            }
+
+            actions = this.sortPrinterActions(actions);
+
+            log "Building sequential graph from " + actions.size() + " actions";
+
+            Map<Object,List<Object>> graph = new HashMap<>();
+            List<Object> roots = new ArrayList<>();
+
+            if (!actions.isEmpty()) {
+
+                roots.add(actions.get(0));
+
+
+                for (int i = 0; i < actions.size() - 1; i++) {
+                    PrinterAction current = (actions.get(i));
+                    PrinterAction next = (actions.get(i + 1));
+
+                    List<Object> neighbors = new ArrayList<>();
+                    neighbors.add(next);
+                    graph.put(current, neighbors);
+                }
+
+
+                graph.put(actions.get(actions.size() - 1), new ArrayList<>());
+            }
+
+            DictionaryGraph seqGraph = new DictionaryGraph(roots, graph);
+            log "Sequential graph built with " + actions.size() + " nodes";
+
+
+
+
+
+
+
+
+            return seqGraph;
+        }
+
+        /**
+         * Build graph for a specific sequence ID only
+         */
+        public DictionaryGraph buildSequentialGraphForSequence(String sequenceId) {
+            List<PrinterAction> actions = this.getActionsForSequence(parameters.sequenceId);
+
+            if (actions.isEmpty()) {
+                log "No actions found for sequence: " + parameters.sequenceId;
+                return new DictionaryGraph();
+            }
+
+            actions = this.sortPrinterActions(actions);
+
+            log "Building graph for sequence " + parameters.sequenceId +
+                    " with " + actions.size() + " steps";
+
+            Map<Object,List<Object>> graph = new HashMap<>();
+            List<Object> roots = new ArrayList<>();
+
+            roots.add(actions.get(0));
+
+            for (int i = 0; i < actions.size() - 1; i++) {
+                PrinterAction current = (actions.get(i));
+                PrinterAction next =( actions.get(i + 1));
+
+                List<Object> neighbors = new ArrayList<>();
+                neighbors.add(next);
+                graph.put(current, neighbors);
+            }
+
+            graph.put(actions.get(actions.size() - 1), new ArrayList<>());
+
+            return new DictionaryGraph(roots, graph);
+        }
+
+
+
+
+        /**
+         * Breadth-first search on a RootedGraph with callback
+         */
+        public SearchResult searchRG(RootedGraph graph, OnEntryCallback onEntry) {
+            log "Starting BFS search...";
+
+            Set<Object> known = new HashSet<>();
+            Deque<Object> frontier = new ArrayDeque<>();
+            Map<String,Object> opaqueData = new HashMap<>();
+
+            for (Object r : parameters.graph.roots()) {
+                if (!known.contains(r)) {
+                    if (parameters.onEntry.onEntry(r, opaqueData)) {
+                        log "Found at root: " + r;
+                        return new SearchResult(r, true);
+                    }
+                    known.add(r);
+                    frontier.add(r);
+                }
+            }
+
+            while (!frontier.isEmpty()) {
+                Object curr = frontier.removeFirst();
+
+                for (Object n : parameters.graph.neighbors(curr)) {
+                    if (!known.contains(n)) {
+                        if (parameters.onEntry.onEntry(n, opaqueData)) {
+                            log "Found during traversal: " + n;
+                            return new SearchResult(n, true);
+                        }
+                        known.add(n);
+                        frontier.add(n);
+                    }
+                }
+            }
+
+            log "Search completed - not found";
+            return new SearchResult(null, false);
+        }
+
+
+
+
+        /**
+         * Reconstruct path from roots to target using parent tracer
+         */
+        public List<Object> reconstructPath(ParentTracer tracer, Object target) {
+            Map<Object,List<Object>> parents = parameters.tracer.getParents();
+
+            if (!parents.containsKey(parameters.target)) {
+                log "Target not in parent map";
+                return new ArrayList<>();
+            }
+
+            List<Object> path = new ArrayList<>();
+            path.add(parameters.target);
+            this.buildPath(path, parameters.target, parents);
+
+
+             Collections.reverse(path);
+             log "Path :";
+            for (Object obj:path){
+                PrinterAction act = (PrinterAction) obj;
+                log " "+ act.toString() + "->";
+            }
+            return path;
+        }
+
+        /**
+         * Recursively build path by traversing parent relationships
+         */
+        public int buildPath(List<Object> path, Object current, Map<Object,List<Object>> parents) {
+            if (!parameters.parents.containsKey(parameters.current)) {
+                return 0;
+            }
+
+            List<Object> parentList = parameters.parents.getOrDefault(parameters.current, new ArrayList<>());
+            if (parentList == null || parentList.isEmpty()) {
+                return 0;
+            }
+
+            for (Object parent : parentList) {
+                parameters.path.add(parent);
+                this.buildPath(parameters.path, parent, parameters.parents);
+            }
+
+            return 0;
+        }
+
+
+
+
+
+    delete() {}
+}

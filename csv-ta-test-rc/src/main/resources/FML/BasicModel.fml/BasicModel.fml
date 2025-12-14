@@ -1,0 +1,162 @@
+use org.openflexo.ta.csv.CSVModelSlot as CSV;
+        use org.openflexo.foundation.fml.rt.FMLRTModelSlot as FMLRT;
+
+import org.openflexo.ta.csv.model.CSVDocument;
+import org.openflexo.ta.csv.model.CSVRow;
+import org.openflexo.ta.csv.model.CSVCell;
+import org.openflexo.ta.csv.fml.editionaction.AddCSVRow;
+import org.openflexo.ta.csv.fml.editionaction.AddCSVCell;
+import org.openflexo.ta.csv.fml.editionaction.SelectCSVCell;
+import org.openflexo.ta.csv.fml.editionaction.SelectCSVRow;
+import org.openflexo.ta.csv.fml.editionaction.SelectUniqueCSVCell;
+import org.openflexo.ta.csv.fml.editionaction.SelectUniqueCSVRow;
+import java.lang.String;
+import java.lang.Integer;
+import java.util.List;
+
+@URI("http://openflexo.org/test/csv/FML/BasicModel.fml")
+public model BasicModel {
+
+public CSVDocument csvData with CSV::CSVModelSlot();
+
+create(required Resource<CSVDocument> resource) {
+    connect csvData using parameters.resource;
+
+
+    log "";
+    log "TEST 1: AddCSVRow - Add new rows";
+    log "----------------------------------------------";
+    int initialRows = csvData.rows.size();
+    log "Initial row count: " + initialRows;
+
+    CSVRow newRow1 = CSV::AddCSVRow(csvDocument=this.csvData, rowIndex=100) in csvData;
+    log "Added row at index 100";
+
+    CSVRow newRow2 = CSV::AddCSVRow(csvDocument=this.csvData, rowIndex=101) in csvData;
+    log "Added row at index 101";
+
+    int afterAddRows = csvData.rows.size();
+    log "Final row count: " + afterAddRows;
+
+    if (afterAddRows != (initialRows + 2)) {
+        log "ERROR: Expected " + (initialRows + 2) + " rows, got " + afterAddRows;
+    } else {
+        log "TEST 1 PASSED!";
+    }
+
+
+    log "";
+    log "TEST 2: AddCSVCell - Add cells to rows";
+    log "----------------------------------------------";
+
+    CSVCell cell1 = CSV::AddCSVCell(row=newRow1, columnIndex=0, value="Test Value 1") in csvData;
+    log "Added cell [100,0]: " + cell1.value;
+
+    CSVCell cell2 = CSV::AddCSVCell(row=newRow1, columnIndex=1, value="Test Value 2") in csvData;
+    log "Added cell [100,1]: " + cell2.value;
+
+    CSVCell cell3 = CSV::AddCSVCell(row=newRow2, columnIndex=0, value="Row 101 Cell") in csvData;
+    log "Added cell [101,0]: " + cell3.value;
+
+    if (cell1.value == "Test Value 1" && cell2.value == "Test Value 2" && cell3.value == "Row 101 Cell") {
+        log "TEST 2 PASSED!";
+    } else {
+        log "ERROR: Cell values don't match";
+    }
+
+
+    log "";
+    log "TEST 3: SelectCSVRow - Select all rows";
+    log "----------------------------------------------";
+
+    List<CSVRow> allRows = CSV::SelectCSVRow(csvDocument=this.csvData) from csvData;
+    log "Total rows selected: " + allRows.size();
+
+    if (allRows.size() == afterAddRows) {
+        log "TEST 3 PASSED!";
+    } else {
+        log "ERROR: Expected " + afterAddRows + " rows, got " + allRows.size();
+    }
+
+
+    log "";
+    log "TEST 4: SelectCSVCell - Select cells from first row";
+    log "----------------------------------------------";
+
+    CSVRow firstRow = (allRows.get(1));
+    log "First row index: " + firstRow.rowIndex;
+
+    List<CSVCell> cellsFromFirstRow = CSV::SelectCSVCell(
+            csvDocument=this.csvData,
+            csvRow=firstRow
+        ) from csvData;
+
+    log "Cells selected from first row: " + cellsFromFirstRow.size();
+
+    if (cellsFromFirstRow.size() > 0) {
+        log "TEST 4 PASSED!";
+    } else {
+        log "ERROR: No cells found in first row";
+    }
+
+
+    log "";
+    log "TEST 5: SelectCSVCell - Select all cells from document";
+    log "----------------------------------------------";
+
+    List<CSVCell> allCells = CSV::SelectCSVCell(
+            csvDocument=this.csvData
+    ) from csvData;
+
+    log "Total cells in document: " + allCells.size();
+
+    if (allCells.size() > 0) {
+        log "TEST 5 PASSED!";
+    } else {
+        log "ERROR: No cells found in document";
+    }
+
+
+    log "";
+    log "TEST 6: SelectCSVCell - Select cells from row 100";
+    log "----------------------------------------------";
+
+    List<CSVCell> row100Cells = CSV::SelectCSVCell(
+            csvDocument=this.csvData,
+            csvRow=newRow1
+        ) from csvData;
+
+    log "Cells in row 100: " + row100Cells.size();
+
+    if (row100Cells.size() == 2) {
+        log "TEST 6 PASSED! (Expected 2 cells, got " + row100Cells.size() + ")";
+    } else {
+        log "WARNING: Expected 2 cells in row 100, got " + row100Cells.size();
+    }
+
+
+    log "";
+    log "TEST 7: Verify specific cell values";
+    log "----------------------------------------------";
+
+    boolean valuesCorrect = true;
+    for (CSVCell c : row100Cells) {
+        log "Cell value: " + c.value;
+        if (c.value != "Test Value 1" && c.value != "Test Value 2") {
+            valuesCorrect = false;
+        }
+    }
+
+    if (valuesCorrect) {
+        log "TEST 7 PASSED!";
+    } else {
+        log "ERROR: Cell values incorrect";
+    }
+
+
+    log "Final statistics:";
+    log "  - Total rows: " + csvData.rows.size();
+    log "  - Total cells: " + allCells.size();
+    log "==============================================";
+}
+}

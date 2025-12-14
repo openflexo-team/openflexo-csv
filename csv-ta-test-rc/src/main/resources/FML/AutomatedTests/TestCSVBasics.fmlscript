@@ -1,0 +1,23 @@
+service ResourceCenterService status;
+resources;
+context;
+
+virtualModel = load -r ["http://openflexo.org/test/csv/FML/BasicModel.fml"];
+context;
+assert virtualModel != null;
+log "Pretty-print of "+virtualModel;
+log virtualModel.fMLPrettyPrint;
+
+csvDoc = load -r ["http://www.openflexo.org/test/csv/TestResourceCenter/CSV/MockData.csv"];
+log "csvDoc=" + csvDoc;
+assert csvDoc != null;
+log "Initial CSV stats:";
+log "  - Rows: " + csvDoc.rows.size();
+log "  - Has Header: " + csvDoc.hasHeader;
+
+
+service ResourceCenterService add_temp_rc;
+myTest = virtualModel.new BasicModel(csvDoc.resource) with (name="BasicModel");
+context;
+assert myTest != null;
+

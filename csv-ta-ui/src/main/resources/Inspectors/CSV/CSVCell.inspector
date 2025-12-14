@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Panel className="org.openflexo.gina.utils.FIBInspector"
+       layout="border"
+       titleFont="SansSerif,0,12"
+       darkLevel="0"
+       dataClassName="org.openflexo.ta.csv.model.CSVCell"
+       controllerClassName="org.openflexo.inspector.FIBInspectorController"
+       font="SansSerif,0,12"
+       name="Inspector">
+
+    <TabPanel name="Tab" constraints="border(location=center)">
+        <Tab title="Basic"
+             layout="twocols"
+             titleFont="SansSerif,0,11"
+             darkLevel="0"
+             index="0"
+             font="SansSerif,0,11"
+             useScrollBar="true"
+             horizontalScrollbarPolicy="HORIZONTAL_SCROLLBAR_AS_NEEDED"
+             verticalScrollbarPolicy="VERTICAL_SCROLLBAR_AS_NEEDED"
+             name="BasicTab">
+
+            <!-- Cell value -->
+            <Label label="value"
+                   index="0"
+                   constraints="twocols(expandHorizontally=false;expandVertically=false;index=0;location=left)"
+                   name="ValueLabel"
+                   localize="true"/>
+            <TextField index="1"
+                       data="data.value"
+                       constraints="twocols(expandHorizontally=true;expandVertically=false;index=1;location=right)"
+                       name="Value"
+                       localize="true"
+                       columns="20"/>
+
+            <!-- Column index -->
+            <Label label="column_index"
+                   index="2"
+                   constraints="twocols(expandHorizontally=false;expandVertically=false;index=2;location=left)"
+                   name="ColumnIndexLabel"
+                   localize="true"/>
+            <Number index="3"
+                    data="data.columnIndex"
+                    constraints="twocols(expandHorizontally=false;expandVertically=false;index=3;location=right)"
+                    name="ColumnIndex"
+                    readOnly="true"
+                    numberType="IntegerType"
+                    columns="5"/>
+
+            <!-- Parent row index -->
+            <Label label="row_index"
+                   index="4"
+                   constraints="twocols(expandHorizontally=false;expandVertically=false;index=4;location=left)"
+                   name="RowIndexLabel"
+                   localize="true"/>
+            <Number index="5"
+                    data="data.csvRow.rowIndex"
+                    constraints="twocols(expandHorizontally=false;expandVertically=false;index=5;location=right)"
+                    name="RowIndex"
+                    readOnly="true"
+                    numberType="IntegerType"
+                    columns="5"/>
+        </Tab>
+    </TabPanel>
+
+    <LocalizedDictionary>
+        <Localized key="Basic" lang="French" value="Basique"/>
+        <Localized key="value" lang="French" value="valeur"/>
+        <Localized key="column_index" lang="French" value="index de colonne"/>
+        <Localized key="row_index" lang="French" value="index de ligne"/>
+    </LocalizedDictionary>
+
+    <Parameter name="title" value="CSV Cell"/>
+</Panel>

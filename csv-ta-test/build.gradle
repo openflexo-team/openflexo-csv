@@ -1,0 +1,16 @@
+dependencies {
+    implementation project(':csv-ta')
+    implementation flexoFoundation()
+
+    implementation testUtils()
+    implementation flexoFoundationTest()
+
+	// testing dep
+    testImplementation flexoFoundation()
+    testImplementation flexoFoundationTest()
+    testImplementation fmlCli()
+    testImplementation fmlCliTest()
+
+    // Test resource center
+    testRuntimeOnly project(':csv-ta-test-rc')
+}

@@ -1,0 +1,11 @@
+dependencies {
+  implementation project(":csv-ta")
+
+  implementation flexoUi()
+
+  runtimeOnly fmlTechnologyAdapterUi()
+
+  testImplementation flexoUiTest()
+
+
+}

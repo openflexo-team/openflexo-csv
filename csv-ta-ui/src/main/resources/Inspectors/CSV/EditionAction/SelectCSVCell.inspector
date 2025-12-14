@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Panel className="org.openflexo.gina.utils.FIBInspector"
+       layout="border"
+       titleFont="SansSerif,0,12"
+       darkLevel="0"
+       dataClassName="org.openflexo.ta.csv.fml.editionaction.AbstractSelectCSVCell"
+       controllerClassName="org.openflexo.fml.controller.FMLFIBInspectorController"
+       font="SansSerif,0,12"
+       name="Inspector">
+
+    <TabPanel name="Tab" constraints="border(location=center)">
+        <Tab title="Basic"
+             layout="twocols"
+             titleFont="SansSerif,0,11"
+             darkLevel="0"
+             index="0"
+             font="SansSerif,0,11"
+             useScrollBar="true"
+             horizontalScrollbarPolicy="HORIZONTAL_SCROLLBAR_AS_NEEDED"
+             verticalScrollbarPolicy="VERTICAL_SCROLLBAR_AS_NEEDED"
+             name="BasicTab">
+
+            <!-- CSV Document binding -->
+            <Label label="document"
+                   align="right"
+                   index="4"
+                   constraints="twocols(expandHorizontally=true;expandVertically=false;index=4;insetsBottom=0;insetsLeft=2;insetsRight=4;insetsTop=5;location=left)"
+                   localize="true"/>
+            <Custom componentClassName="org.openflexo.gina.swing.utils.BindingSelector"
+                    manageDynamicModel="true"
+                    opaque="false"
+                    index="4"
+                    data="data.csvDocument"
+                    constraints="twocols(expandHorizontally=true;expandVertically=false;index=4;insetsBottom=0;insetsLeft=2;insetsRight=2;insetsTop=0;location=right)">
+                <Assignment variable="component.bindable" value="data"/>
+            </Custom>
+
+            <!-- Optional row binding -->
+            <Label label="row_(optional)"
+                   align="right"
+                   index="6"
+                   constraints="twocols(expandHorizontally=true;expandVertically=false;index=6;insetsBottom=0;insetsLeft=2;insetsRight=2;insetsTop=5;location=left)"
+                   localize="true"/>
+            <Custom componentClassName="org.openflexo.gina.swing.utils.BindingSelector"
+                    manageDynamicModel="true"
+                    opaque="false"
+                    index="5"
+                    data="data.csvRow"
+                    constraints="twocols(expandHorizontally=true;expandVertically=false;index=5;insetsBottom=0;insetsLeft=2;insetsRight=2;insetsTop=0;location=right)">
+                <Assignment variable="component.bindable" value="data"/>
+            </Custom>
+        </Tab>
+    </TabPanel>
+
+    <LocalizedDictionary>
+        <Localized key="Advanced" lang="French" value="Avancé"/>
+        <Localized key="Basic" lang="French" value="Basique"/>
+        <Localized key="document" lang="French" value="document"/>
+        <Localized key="row_(optional)" lang="French" value="ligne (optionnel)"/>
+    </LocalizedDictionary>
+
+    <Parameter name="title" value="SelectCSVCell action"/>
+</Panel>

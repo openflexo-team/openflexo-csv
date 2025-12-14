@@ -1,0 +1,25 @@
+service ResourceCenterService status;
+resources;
+context;
+
+virtualModel = load -r ["http://openflexo.org/test/csv/FML/TestCSVVM.fml"];
+context;
+assert virtualModel != null;
+log "Pretty-print of "+virtualModel;
+log virtualModel.fMLPrettyPrint;
+
+csvDoc = load -r ["http://www.openflexo.org/test/csv/TestResourceCenter/CSV/MockData.csv"];
+log "csvDoc=" + csvDoc;
+assert csvDoc != null;
+
+service ResourceCenterService add_temp_rc;
+myCsv = new TestCSVVM(csvDoc.resource) with (name="TestCSVVM");
+context;
+assert myCsv != null;
+myCsv.testGetDocIndexed();
+//myCsv.loadPrinterLogs();
+//myCsv.getActions();
+//graph = myCsv.buildSequentialGraph();
+//graph.logRootAndNeighbors();
+
+

@@ -1,0 +1,153 @@
+service ResourceCenterService status;
+resources;
+context;
+
+printerModel = load -r ["http://openflexo.org/test/csv/FML/PrinterModel.fml"];
+context;
+assert printerModel != null;
+
+
+
+sequenceData = load -r ["http://www.openflexo.org/test/csv/TestResourceCenter/CSV/PrinterActionSequence.csv"];
+assert sequenceData != null;
+log "sequenceData=" + sequenceData;
+
+
+service ResourceCenterService add_temp_rc;
+workflow = new PrinterModel(sequenceData.resource) with (name="printer_workflow");
+context;
+assert workflow != null;
+
+workflow.loadPrinterLogs();
+workflow.printSummary();
+
+log "=== Displaying All Actions ===";
+workflow.getActions();
+
+
+
+
+log "=== Analyzing SEQ001 ===";
+seq001Actions = workflow.getActionsForSequence("SEQ001");
+log "SEQ001 has " + seq001Actions.size() + " steps";
+assert seq001Actions.size() == 32;
+
+
+
+log "=== Finding Critical Actions ===";
+criticalActions = workflow.getCriticalActions();
+log "Found " + criticalActions.size() + " critical actions";
+assert criticalActions.size() == 43;
+
+
+
+log "=== Finding Actions in HEATING State ===";
+heatingActions = workflow.getActionsByState("HEATING");
+log "Actions involving HEATING state: " + heatingActions.size();
+assert heatingActions.size() > 0;
+
+
+
+
+
+log "=== Building Sequential Graph ===";
+graph = workflow.buildSequentialGraph();
+assert graph != null;
+log "Graph built successfully";
+
+
+graph.logRootAndNeighbors();
+
+
+
+
+log "=== Building Graph for SEQ001 ===";
+seq001Graph = workflow.buildSequentialGraphForSequence("SEQ001");
+assert seq001Graph != null;
+log "SEQ001 graph built";
+
+
+
+
+
+log "=== Searching for ACT_HEAT_BED ===";
+findHeatBed = workflow.new FindAction("ACT_HEAT_BED");
+searchResult = workflow.searchRG(seq001Graph, findHeatBed);
+
+assert searchResult != null;
+assert searchResult.found == true;
+log "Found ACT_HEAT_BED";
+
+
+foundAction = (PrinterAction) searchResult.state;
+log "  Step number: " + foundAction.stepNumber;
+log "  State transition: " + foundAction.stateBefore + " -> " + foundAction.stateAfter;
+log "  Duration: " + foundAction.durationSeconds + " seconds";
+log "  Is critical: " + foundAction.isCritical;
+
+
+
+
+
+log "=== Searching for Step 10 ===";
+findStep10 = workflow.new FindStepNumber(10);
+stepResult = workflow.searchRG(seq001Graph, findStep10);
+
+assert stepResult != null;
+assert stepResult.found == true;
+foundStep = (PrinterAction) stepResult.state;
+log "  Found step 10: " + foundStep.actionId;
+log "  Action type: " + foundStep.actionType;
+log "  Status: " + foundStep.status;
+
+
+
+
+
+log "=== Searching for HEATING State ===";
+findHeating = workflow.new FindState("HEATING");
+stateResult = workflow.searchRG(seq001Graph, findHeating);
+
+assert stateResult != null;
+assert stateResult.found == true;
+foundState = (PrinterAction) stateResult.state;
+log "  Found HEATING state at step: " + foundState.stepNumber;
+log "  Action: " + foundState.actionId;
+
+
+
+log "=== Checking Action Properties ===";
+
+
+firstAction = seq001Actions.get(0);
+log "First action: " + firstAction.actionId;
+log "  Is gateway: " + firstAction.isGateway();
+log "  Is parallel: " + firstAction.isParallelExecution();
+log "  Is critical: " + firstAction.isCriticalStep();
+log "  Is completed: " + firstAction.isCompleted();
+log "  Is user task: " + firstAction.isUserTask();
+
+
+userTaskAction = seq001Actions.get(7);
+log "Action at index 7: " + userTaskAction.actionId;
+log "  Is user task: " + userTaskAction.isUserTask();
+assert userTaskAction.actionType == "UserTask";
+
+
+
+
+log "=== Path Reconstruction ===";
+
+
+tracer = workflow.new ParentTracer(seq001Graph);
+
+
+tracedSearch = workflow.searchRG(tracer, findHeatBed);
+
+assert tracedSearch.found == true;
+log "  Action found, reconstructing path...";
+
+
+path = workflow.reconstructPath(tracer, tracedSearch.state);
+log "Path length: " + path.size();
+log "  Path reconstructed successfully";

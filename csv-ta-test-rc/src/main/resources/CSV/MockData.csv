@@ -1,0 +1,21 @@
+timestamp,action
+2023-10-27 09:00:00,Receive_Print_Job
+2023-10-27 09:00:02,System_Initialization
+2023-10-27 09:00:10,Arm_Homing_Sequence
+2023-10-27 09:00:25,Preheat_Nozzle_200C
+2023-10-27 09:00:25,Preheat_Bed_60C
+2023-10-27 09:03:00,Temperature_Target_Reached
+2023-10-27 09:03:05,Move_To_Start_Coordinates
+2023-10-27 09:03:10,Calibrate_Bed_Level
+2023-10-27 09:04:00,Extrude_Prime_Line
+2023-10-27 09:04:15,Begin_Layer_1
+2023-10-27 09:14:15,Move_Z_Axis_Increment
+2023-10-27 09:14:20,Begin_Layer_2
+2023-10-27 09:24:20,Move_Z_Axis_Increment
+2023-10-27 09:24:25,Begin_Layer_3
+2023-10-27 09:34:25,Stop_Extrusion
+2023-10-27 09:34:27,Retract_Filament
+2023-10-27 09:34:30,Cool_Down_Sequence
+2023-10-27 09:34:30,Fan_Speed_100
+2023-10-27 09:38:00,Move_To_Park_Position
+2023-10-27 09:38:10,Job_Completed_Signal
