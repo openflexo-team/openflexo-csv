@@ -52,44 +52,37 @@ import org.openflexo.pamela.annotations.XMLElement;
 import org.openflexo.ta.csv.CSVTechnologyAdapter;
 import org.openflexo.ta.csv.model.CSVRow;
 
-
 @ModelEntity
 @ImplementationClass(CSVRowRole.CSVRowRoleImpl.class)
 @XMLElement
 @FML("CSVRowRole")
 public interface CSVRowRole extends FlexoRole<CSVRow> {
 
-	
 	public static abstract class CSVRowRoleImpl extends FlexoRoleImpl<CSVRow> implements CSVRowRole {
 
-		
 		@Override
 		public Type getType() {
 			return CSVRow.class;
 		}
 
-		
 		@Override
 		public String getTypeDescription() {
 			return CSVRow.class.getSimpleName();
 		}
 
-		
 		@Override
 		public RoleCloningStrategy defaultCloningStrategy() {
 			return RoleCloningStrategy.Reference;
 		}
 
-		
 		@Override
 		public boolean defaultBehaviourIsToBeDeleted() {
 			return false;
 		}
 
-		
 		@Override
 		public ActorReference<CSVRow> makeActorReference(CSVRow object, FlexoConceptInstance fci) {
-			AbstractVirtualModelInstanceModelFactory<?> factory = fci.getFactory();
+			AbstractVirtualModelInstanceModelFactory factory = fci.getFactory();
 			CSVActorReference<CSVRow> returned = factory.newInstance(CSVActorReference.class);
 			returned.setFlexoRole(this);
 			returned.setFlexoConceptInstance(fci);
@@ -97,7 +90,6 @@ public interface CSVRowRole extends FlexoRole<CSVRow> {
 			return returned;
 		}
 
-		
 		@Override
 		public Class<? extends TechnologyAdapter> getRoleTechnologyAdapterClass() {
 			return CSVTechnologyAdapter.class;

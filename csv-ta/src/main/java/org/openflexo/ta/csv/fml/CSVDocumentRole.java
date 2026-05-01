@@ -40,7 +40,6 @@ package org.openflexo.ta.csv.fml;
 
 import java.lang.reflect.Type;
 
-import org.openflexo.foundation.fml.FMLTechnologyAdapter;
 import org.openflexo.foundation.fml.FlexoRole;
 import org.openflexo.foundation.fml.annotations.FML;
 import org.openflexo.foundation.fml.rt.AbstractVirtualModelInstanceModelFactory;
@@ -53,57 +52,47 @@ import org.openflexo.pamela.annotations.XMLElement;
 import org.openflexo.ta.csv.CSVTechnologyAdapter;
 import org.openflexo.ta.csv.model.CSVDocument;
 
-
 @ModelEntity
 @ImplementationClass(CSVDocumentRole.CSVDocumentRoleImpl.class)
 @XMLElement
 @FML("CSVDocumentRole")
 public interface CSVDocumentRole extends FlexoRole<CSVDocument> {
 
-    
-    public static abstract class CSVDocumentRoleImpl extends FlexoRoleImpl<CSVDocument> implements CSVDocumentRole {
+	public static abstract class CSVDocumentRoleImpl extends FlexoRoleImpl<CSVDocument> implements CSVDocumentRole {
 
-        
-        @Override
-        public Type getType() {
-            return CSVDocument.class;
-        }
+		@Override
+		public Type getType() {
+			return CSVDocument.class;
+		}
 
+		@Override
+		public String getTypeDescription() {
+			return CSVDocument.class.getSimpleName();
+		}
 
+		@Override
+		public RoleCloningStrategy defaultCloningStrategy() {
+			return RoleCloningStrategy.Reference;
+		}
 
-        
-        @Override
-        public String getTypeDescription() {
-            return CSVDocument.class.getSimpleName();
-        }
+		@Override
+		public boolean defaultBehaviourIsToBeDeleted() {
+			return false;
+		}
 
-        
-        @Override
-        public RoleCloningStrategy defaultCloningStrategy() {
-            return RoleCloningStrategy.Reference;
-        }
+		@Override
+		public ActorReference<CSVDocument> makeActorReference(CSVDocument object, FlexoConceptInstance fci) {
+			AbstractVirtualModelInstanceModelFactory factory = fci.getFactory();
+			CSVActorReference<CSVDocument> returned = factory.newInstance(CSVActorReference.class);
+			returned.setFlexoRole(this);
+			returned.setFlexoConceptInstance(fci);
+			returned.setModellingElement(object);
+			return returned;
+		}
 
-        
-        @Override
-        public boolean defaultBehaviourIsToBeDeleted() {
-            return false;
-        }
-
-        
-        @Override
-        public ActorReference<CSVDocument> makeActorReference(CSVDocument object, FlexoConceptInstance fci) {
-            AbstractVirtualModelInstanceModelFactory<?> factory = fci.getFactory();
-            CSVActorReference<CSVDocument> returned = factory.newInstance(CSVActorReference.class);
-            returned.setFlexoRole(this);
-            returned.setFlexoConceptInstance(fci);
-            returned.setModellingElement(object);
-            return returned;
-        }
-
-        
-        @Override
-        public Class<? extends TechnologyAdapter> getRoleTechnologyAdapterClass() {
-            return CSVTechnologyAdapter.class;
-        }
-    }
+		@Override
+		public Class<? extends TechnologyAdapter> getRoleTechnologyAdapterClass() {
+			return CSVTechnologyAdapter.class;
+		}
+	}
 }

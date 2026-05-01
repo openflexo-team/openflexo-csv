@@ -52,55 +52,47 @@ import org.openflexo.pamela.annotations.XMLElement;
 import org.openflexo.ta.csv.CSVTechnologyAdapter;
 import org.openflexo.ta.csv.model.CSVColumn;
 
-
 @ModelEntity
 @ImplementationClass(CSVColumnRole.CSVColumnRoleImpl.class)
 @XMLElement
 @FML("CSVColumnRole")
 public interface CSVColumnRole extends FlexoRole<CSVColumn> {
 
-    
-    public static abstract class CSVColumnRoleImpl extends FlexoRoleImpl<CSVColumn> implements CSVColumnRole {
+	public static abstract class CSVColumnRoleImpl extends FlexoRoleImpl<CSVColumn> implements CSVColumnRole {
 
-        
-        @Override
-        public Type getType() {
-            return CSVColumn.class;
-        }
+		@Override
+		public Type getType() {
+			return CSVColumn.class;
+		}
 
-        
-        @Override
-        public String getTypeDescription() {
-            return CSVColumn.class.getSimpleName();
-        }
+		@Override
+		public String getTypeDescription() {
+			return CSVColumn.class.getSimpleName();
+		}
 
-        
-        @Override
-        public RoleCloningStrategy defaultCloningStrategy() {
-            return RoleCloningStrategy.Reference;
-        }
+		@Override
+		public RoleCloningStrategy defaultCloningStrategy() {
+			return RoleCloningStrategy.Reference;
+		}
 
-        
-        @Override
-        public boolean defaultBehaviourIsToBeDeleted() {
-            return false;
-        }
+		@Override
+		public boolean defaultBehaviourIsToBeDeleted() {
+			return false;
+		}
 
-        
-        @Override
-        public ActorReference<CSVColumn> makeActorReference(CSVColumn object, FlexoConceptInstance fci) {
-            AbstractVirtualModelInstanceModelFactory<?> factory = fci.getFactory();
-            CSVActorReference<CSVColumn> returned = factory.newInstance(CSVActorReference.class);
-            returned.setFlexoRole(this);
-            returned.setFlexoConceptInstance(fci);
-            returned.setModellingElement(object);
-            return returned;
-        }
+		@Override
+		public ActorReference<CSVColumn> makeActorReference(CSVColumn object, FlexoConceptInstance fci) {
+			AbstractVirtualModelInstanceModelFactory factory = fci.getFactory();
+			CSVActorReference<CSVColumn> returned = factory.newInstance(CSVActorReference.class);
+			returned.setFlexoRole(this);
+			returned.setFlexoConceptInstance(fci);
+			returned.setModellingElement(object);
+			return returned;
+		}
 
-        
-        @Override
-        public Class<? extends TechnologyAdapter> getRoleTechnologyAdapterClass() {
-            return CSVTechnologyAdapter.class;
-        }
-    }
+		@Override
+		public Class<? extends TechnologyAdapter> getRoleTechnologyAdapterClass() {
+			return CSVTechnologyAdapter.class;
+		}
+	}
 }
