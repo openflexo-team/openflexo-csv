@@ -30,7 +30,7 @@
                     manageDynamicModel="true"
                     opaque="false"
                     index="4"
-                    data="data.csvDocument"
+                    data="data.getCSVDocument()"
                     constraints="twocols(expandHorizontally=true;expandVertically=false;index=4;insetsBottom=0;insetsLeft=2;insetsRight=2;insetsTop=0;location=right)">
                 <Assignment variable="component.bindable" value="data"/>
             </Custom>
@@ -45,7 +45,7 @@
                     manageDynamicModel="true"
                     opaque="false"
                     index="5"
-                    data="data.csvRow"
+                    data="data.getCSVRow()"
                     constraints="twocols(expandHorizontally=true;expandVertically=false;index=5;insetsBottom=0;insetsLeft=2;insetsRight=2;insetsTop=0;location=right)">
                 <Assignment variable="component.bindable" value="data"/>
             </Custom>

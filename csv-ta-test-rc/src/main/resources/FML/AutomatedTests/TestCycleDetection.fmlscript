@@ -1,0 +1,49 @@
+service ResourceCenterService status;
+resources;
+context;
+
+printerModel = load -r ["http://openflexo.org/test/csv/FML/PrinterModel.fml"];
+context;
+assert printerModel != null;
+
+
+sequenceData = load -r ["http://www.openflexo.org/test/csv/TestResourceCenter/CSV/PrinterActionSequence.csv"];
+assert sequenceData != null;
+
+
+service ResourceCenterService add_temp_rc;
+workflow = new PrinterModel(sequenceData.resource) with (name="cycle_workflow");
+context;
+assert workflow != null;
+
+workflow.loadPrinterLogs();
+
+
+log "=== Building Cyclic Graph for SEQ001 ===";
+cyclicGraph = workflow.buildCyclicGraphForSequence("SEQ001");
+assert cyclicGraph != null;
+log "Cyclic graph built successfully";
+
+
+log "=== Searching for ACT_HEAT_BED in cyclic graph ===";
+findHeatBed = workflow.new FindAction("ACT_HEAT_BED");
+foundResult = workflow.searchRG(cyclicGraph, findHeatBed);
+
+assert foundResult != null;
+assert foundResult.found == true;
+foundAction = (PrinterAction) foundResult.state;
+assert foundAction.actionId == "ACT_HEAT_BED";
+log "Found ACT_HEAT_BED despite cycle in graph";
+
+
+log "=== Searching for a step that does not exist ===";
+findMissing = workflow.new FindStepNumber(-9999);
+missingResult = workflow.searchRG(cyclicGraph, findMissing);
+
+assert missingResult != null;
+assert missingResult.found == false;
+log "Search over cyclic graph correctly terminated without finding missing step";
+log "(the cycle did not cause an infinite loop)";
+
+
+log "Test PASSED: cycle detection / traversal safety validated";

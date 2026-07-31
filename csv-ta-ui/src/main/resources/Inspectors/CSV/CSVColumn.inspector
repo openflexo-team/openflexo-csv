@@ -3,7 +3,7 @@
        layout="border"
        titleFont="SansSerif,0,12"
        darkLevel="0"
-       dataClassName="org.openflexo.ta.csv.model.CSVCell"
+       dataClassName="org.openflexo.ta.csv.model.CSVColumn"
        controllerClassName="org.openflexo.inspector.FIBInspectorController"
        font="SansSerif,0,12"
        name="Inspector">
@@ -20,18 +20,19 @@
              verticalScrollbarPolicy="VERTICAL_SCROLLBAR_AS_NEEDED"
              name="BasicTab">
 
-            <!-- Cell value -->
-            <Label label="value"
+            <!-- Column name -->
+            <Label label="name"
                    index="0"
                    constraints="twocols(expandHorizontally=false;expandVertically=false;index=0;location=left)"
-                   name="ValueLabel"
+                   name="NameLabel"
                    localize="true"/>
             <TextField index="1"
-                       data="data.value"
+                       data="data.name"
                        constraints="twocols(expandHorizontally=true;expandVertically=false;index=1;location=right)"
-                       name="Value"
+                       name="Name"
+                       readOnly="true"
                        localize="true"
-                       columns="20"/>
+                       columns="15"/>
 
             <!-- Column index -->
             <Label label="column_index"
@@ -47,28 +48,43 @@
                     numberType="IntegerType"
                     columns="5"/>
 
-            <!-- Parent row index -->
-            <Label label="row_index"
+            <!-- Data type -->
+            <Label label="data_type"
                    index="4"
                    constraints="twocols(expandHorizontally=false;expandVertically=false;index=4;location=left)"
-                   name="RowIndexLabel"
+                   name="DataTypeLabel"
                    localize="true"/>
-            <Number index="5"
-                    data="data.getCSVRow().rowIndex"
-                    constraints="twocols(expandHorizontally=false;expandVertically=false;index=5;location=right)"
-                    name="RowIndex"
-                    readOnly="true"
-                    numberType="IntegerType"
-                    columns="5"/>
+            <TextField index="5"
+                       data="data.dataType"
+                       constraints="twocols(expandHorizontally=true;expandVertically=false;index=5;location=right)"
+                       name="DataType"
+                       readOnly="true"
+                       localize="true"
+                       columns="10"/>
+
+            <!-- Parent document -->
+            <Label label="document"
+                   index="6"
+                   constraints="twocols(expandHorizontally=false;expandVertically=false;index=6;location=left)"
+                   name="DocumentLabel"
+                   localize="true"/>
+            <TextField index="7"
+                       data="data.getCSVDocument().resource.name"
+                       constraints="twocols(expandHorizontally=true;expandVertically=false;index=7;location=right)"
+                       name="Document"
+                       readOnly="true"
+                       localize="true"
+                       columns="15"/>
         </Tab>
     </TabPanel>
 
     <LocalizedDictionary>
         <Localized key="Basic" lang="French" value="Basique"/>
-        <Localized key="value" lang="French" value="valeur"/>
+        <Localized key="name" lang="French" value="nom"/>
         <Localized key="column_index" lang="French" value="index de colonne"/>
-        <Localized key="row_index" lang="French" value="index de ligne"/>
+        <Localized key="data_type" lang="French" value="type de données"/>
+        <Localized key="document" lang="French" value="document"/>
     </LocalizedDictionary>
 
-    <Parameter name="title" value="CSV Cell"/>
+    <Parameter name="title" value="CSV Column"/>
 </Panel>

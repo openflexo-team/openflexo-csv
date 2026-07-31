@@ -217,7 +217,7 @@ public class TestCSVEditionActions extends OpenflexoTestCase {
         
         CSVRow row = testDocument.getRowAt(0);
         assertNotNull("Row at index 0 should exist", row);
-        assertEquals("Row index should be 0", -1, row.getRowIndex());
+        assertEquals("Row index should be 0", 0, row.getRowIndex());
 
         
         int lastIndex = testDocument.getRowCount() - 1;

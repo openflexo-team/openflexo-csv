@@ -3,7 +3,7 @@
        layout="border"
        titleFont="SansSerif,0,12"
        darkLevel="0"
-       dataClassName="org.openflexo.ta.csv.fml.editionaction.AddCSVRow"
+       dataClassName="org.openflexo.ta.csv.fml.editionaction.SelectUniqueCSVRow"
        controllerClassName="org.openflexo.fml.controller.FMLFIBInspectorController"
        font="SansSerif,0,12"
        name="Inspector">
@@ -34,23 +34,6 @@
                     constraints="twocols(expandHorizontally=true;expandVertically=false;index=4;insetsBottom=0;insetsLeft=2;insetsRight=2;insetsTop=0;location=right)">
                 <Assignment variable="component.bindable" value="data"/>
             </Custom>
-
-            <!-- Row index binding -->
-            <Label label="row_index"
-                   align="right"
-                   index="6"
-                   constraints="twocols(expandHorizontally=true;expandVertically=false;index=6;insetsBottom=0;insetsLeft=2;insetsRight=2;insetsTop=5;location=left)"
-                   localize="true"/>
-            <Custom componentClassName="org.openflexo.gina.swing.utils.BindingSelector"
-                    localize="true"
-                    manageDynamicModel="true"
-                    opaque="false"
-                    index="5"
-                    data="data.rowIndex"
-                    constraints="twocols(expandHorizontally=true;expandVertically=false;index=5;insetsBottom=0;insetsLeft=2;insetsRight=2;insetsTop=0;location=right)"
-                    visible="">
-                <Assignment variable="component.bindable" value="data"/>
-            </Custom>
         </Tab>
     </TabPanel>
 
@@ -58,8 +41,7 @@
         <Localized key="Advanced" lang="French" value="Avancé"/>
         <Localized key="Basic" lang="French" value="Basique"/>
         <Localized key="document" lang="French" value="document"/>
-        <Localized key="row_index" lang="French" value="index de ligne"/>
     </LocalizedDictionary>
 
-    <Parameter name="title" value="AddCSVRow action"/>
+    <Parameter name="title" value="SelectUniqueCSVRow action"/>
 </Panel>

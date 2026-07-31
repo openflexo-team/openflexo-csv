@@ -300,12 +300,12 @@ public class TestLoadCSVDocuments extends AbstractTestCSV {
 			assertNotNull("First row should not be null", firstRow);
 
 
-			assertEquals("First row index should be 0", -1, firstRow.getRowIndex());
+			assertEquals("First row index should be 0", 0, firstRow.getRowIndex());
 
 
 			CSVRow lastRow = document.getRowAt(rowCount - 1);
 			assertNotNull("Last row should not be null", lastRow);
-			assertEquals("Last row index should match", rowCount - 2, lastRow.getRowIndex());
+			assertEquals("Last row index should match", rowCount - 1, lastRow.getRowIndex());
 
 
 			logger.info("Verifying all " + rowCount + " data rows have correct indices...");
@@ -313,7 +313,7 @@ public class TestLoadCSVDocuments extends AbstractTestCSV {
 				CSVRow row = document.getRowAt(i);
 				assertNotNull("Row at position " + i + " should not be null", row);
 
-				int expectedIndex = i-1;
+				int expectedIndex = i;
 				int actualIndex = row.getRowIndex();
 
 				assertEquals("Row at position " + i + " should have index " + expectedIndex,

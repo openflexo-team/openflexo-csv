@@ -646,6 +646,46 @@ public concept DictionaryGraph extends RootedGraph {
             return new DictionaryGraph(roots, graph);
         }
 
+        /**
+         * Build graph for a specific sequence ID, like buildSequentialGraphForSequence(),
+         * but with a deliberate cycle: the last action's neighbor is the first action
+         * instead of having no neighbors. Used to validate that graph traversal
+         * (searchRG) terminates safely when the graph contains a cycle.
+         */
+        public DictionaryGraph buildCyclicGraphForSequence(String sequenceId) {
+            List<PrinterAction> actions = this.getActionsForSequence(parameters.sequenceId);
+
+            if (actions.isEmpty()) {
+                log "No actions found for sequence: " + parameters.sequenceId;
+                return new DictionaryGraph();
+            }
+
+            actions = this.sortPrinterActions(actions);
+
+            log "Building cyclic graph for sequence " + parameters.sequenceId +
+                    " with " + actions.size() + " steps";
+
+            Map<Object,List<Object>> graph = new HashMap<>();
+            List<Object> roots = new ArrayList<>();
+
+            roots.add(actions.get(0));
+
+            for (int i = 0; i < actions.size() - 1; i++) {
+                PrinterAction current = (actions.get(i));
+                PrinterAction next =( actions.get(i + 1));
+
+                List<Object> neighbors = new ArrayList<>();
+                neighbors.add(next);
+                graph.put(current, neighbors);
+            }
+
+            List<Object> lastNeighbors = new ArrayList<>();
+            lastNeighbors.add(actions.get(0));
+            graph.put(actions.get(actions.size() - 1), lastNeighbors);
+
+            return new DictionaryGraph(roots, graph);
+        }
+
 
 
 

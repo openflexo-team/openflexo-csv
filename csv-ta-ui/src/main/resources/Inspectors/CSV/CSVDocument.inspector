@@ -27,7 +27,7 @@
                    name="NameLabel"
                    localize="true"/>
             <TextField index="1"
-                       data="data.name"
+                       data="data.resource.name"
                        constraints="twocols(expandHorizontally=true;expandVertically=false;index=1;location=right)"
                        name="Name"
                        readOnly="true"
@@ -55,7 +55,7 @@
                    name="URILabel"
                    localize="true"/>
             <TextField index="5"
-                       data="data.resource.URI"
+                       data="data.resource.getURI()"
                        constraints="twocols(expandHorizontally=true;expandVertically=false;index=5;location=right)"
                        name="URI"
                        readOnly="true"

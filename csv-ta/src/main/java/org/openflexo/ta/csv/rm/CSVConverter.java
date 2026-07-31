@@ -334,6 +334,10 @@ public class CSVConverter {
     private CSVRow createHeaderRow(CSVDocument document, CSVModelFactory factory, String[] values) {
         CSVRow headerRow = factory.makeCSVRow(-1);
         headerRow.setCSVDocument(document);
+        // setCSVDocument() above also adds headerRow to document.getRows() (bidirectional
+        // inverse of CSVRow.CSV_DOCUMENT_KEY is CSVDocument.ROWS_KEY). The header is tracked
+        // via document.getHeaderRow()/setHeaderRow(), not the data rows list, so undo that.
+        document.removeFromRows(headerRow);
 
         for (int i = 0; i < values.length; i++) {
             CSVCell cell = factory.makeCSVCell(values[i], i);

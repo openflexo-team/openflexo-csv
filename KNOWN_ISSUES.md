@@ -68,19 +68,28 @@ Could add a hashmap cache if needed.
 
 ## Test Suite Status
 
-**Current:** 113 out of 120 tests passing (94% pass rate)
+**Current:** 135 out of 135 tests passing (100% pass rate)
 
-### Failing Tests (7 total)
+All previously known failures have been fixed:
 
-**csv-ta-test module (3 failures):**
-
-1. `TestCSVResource.test8_LoadNonExistentResource` - Edge case for error handling
-2. `TestCSVConverter.test15_ParseInconsistentRowLengths` - Related to malformed CSV handling
-
-**csv-ta-ui module (4 failures):**
-
-All in `TestCSVInspectors` - these are UI inspector tests that need updating after some refactoring.
-
+- `TestCSVConverter.test15_ParseInconsistentRowLengths` — root cause was `CSVConverter.createHeaderRow()`
+  implicitly adding the header row into `CSVDocument.getRows()` (PAMELA maintains `CSVRow.csvDocument`'s
+  inverse, which is `CSVDocument.rows`), shifting every data row's index by one. Fixed by explicitly
+  removing the header row from the list right after it's added.
+- `TestCSVResource.test8_LoadNonExistentResource` — the shared `getCSVResource()` test helper asserts
+  non-null, so it could never exercise the "resource not found" branch. Rewritten to query the
+  `ResourceManager` directly.
+- `TestCSVInspectors` (16 failures in `csv-ta-ui`) — ~10 `.inspector` FIB files were missing entirely,
+  and several existing ones bound properties like `data.csvDocument`/`data.csvRow` that don't resolve:
+  Connie's reflective property lookup only uppercases the *first* letter of a binding path segment
+  (`csvDocument` → tries `getCsvDocument()`), which never matches PAMELA getters that keep the whole
+  `CSV` acronym capitalized (`getCSVDocument()`). A bare capitalized path (`data.CSVDocument`) doesn't
+  parse either (Connie's grammar treats a leading-uppercase segment as a type reference). The fix is to
+  bind via explicit method-call syntax, e.g. `data.getCSVDocument()`.
+- `TestScript.testPrinterModelWithCycleDetection` — referenced a `TestCycleDetection.fmlscript` that
+  didn't exist. The underlying BFS graph search (`PrinterModel.searchRG`) already tracks visited nodes
+  and is cycle-safe; added the missing script plus a `buildCyclicGraphForSequence()` helper in
+  `PrinterModel.fml` to actually exercise a graph with a cycle.
 
 ---
 

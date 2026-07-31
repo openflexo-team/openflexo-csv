@@ -218,7 +218,9 @@ public class TestCSVResource extends AbstractTestCSV {
         log("test8_LoadNonExistentResource");
 
         try {
-            CSVResource resource = getCSVResource("non_existent_file.csv");
+            String documentURI = resourceCenter.getDefaultBaseURI() + "/CSV/non_existent_file.csv";
+            CSVResource resource = (CSVResource) serviceManager.getResourceManager().getResource(
+                    documentURI, null, CSVDocument.class);
             if (resource != null) {
                 resource.loadResourceData();
                 fail("Should throw exception for non-existent resource");
