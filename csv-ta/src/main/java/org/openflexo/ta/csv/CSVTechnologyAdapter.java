@@ -116,7 +116,8 @@ public class CSVTechnologyAdapter extends TechnologyAdapter<CSVTechnologyAdapter
 		CSVResourceRepository<I> returned = resourceCenter.retrieveRepository(CSVResourceRepository.class, this);
 		if (returned == null) {
 			returned = CSVResourceRepository.instanciateNewRepository(this, resourceCenter);
-			resourceCenter.registerRepository(returned, CSVResourceRepository.class, this);
+			// Another thread may have registered one meanwhile: use the registered one (CORE-D-25)
+			returned = resourceCenter.registerRepository(returned, CSVResourceRepository.class, this);
 
 			if (logger.isLoggable(Level.INFO)) {
 				logger.info("Created new CSV resource repository for resource center: " + resourceCenter.getDefaultBaseURI());
