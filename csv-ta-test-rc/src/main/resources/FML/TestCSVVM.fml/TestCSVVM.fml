@@ -52,14 +52,14 @@ public model TestCSVVM {
         }
     }
     public void testGetDocIndexed(){
-        CSVRow row = this.logData.row_3;
+        CSVRow row = this.logData.getRowAt(3);
         log "does this work ? " + row ;
 
     }
         public void assignRow(CSVRow row){
             CSVRow tmpRow = parameters.row;
-            String timeStamp = row.getCellAt(0).value;
-            String actionP= row.getCellAt(1).value;
+            String timeStamp = tmpRow.getCellAt(0).value;
+            String actionP= tmpRow.getCellAt(1).value;
             Integer sequenceId = tmpRow.rowIndex ;
             log "Assined vars seqId :" + sequenceId + ":  Action " + actionP + "@TimeStamp " + timeStamp + "";
         }
@@ -157,21 +157,23 @@ public concept DictionaryGraph extends RootedGraph {
     public void logRootAndNeighbors(){
         log "Logging Roots and neighbors for : ";
         List<Object> rootList = this.roots();
-        List<Object> neighList = this.neighbors();
 
-            if (rootList == null){
-                log "ROOT EMPTY ";
-            }
-            if (neighList == null){
-                log "NEIGHBORS EMPTY ";
-            }
-
+        if (rootList == null){
+            log "ROOT EMPTY ";
+            return;
+        }
 
         for (Object root : rootList) {
             log "Root" + root;
-        }
-        for(Object nei:neighList){
-            log "Neighbor" + nei;
+            List<Object> neighList = this.neighbors(root);
+            if (neighList == null){
+                log "NEIGHBORS EMPTY ";
+            }
+            else {
+                for(Object nei:neighList){
+                    log "Neighbor" + nei;
+                }
+            }
         }
 
     }
