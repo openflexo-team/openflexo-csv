@@ -64,7 +64,7 @@
     </TabPanel>
 
     <LocalizedDictionary>
-        <Localized key="document" lang="French" value="document"/>
+        <Localized key="document" lang="French" value="Document"/>
     </LocalizedDictionary>
 
     <Parameter name="title" value="SelectCSVRow action"/>

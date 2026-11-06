@@ -82,7 +82,7 @@
         <Localized key="name" lang="French" value="nom"/>
         <Localized key="column_index" lang="French" value="index de colonne"/>
         <Localized key="data_type" lang="French" value="type de données"/>
-        <Localized key="document" lang="French" value="document"/>
+        <Localized key="document" lang="French" value="Document"/>
     </LocalizedDictionary>
 
     <Parameter name="title" value="CSV Column"/>

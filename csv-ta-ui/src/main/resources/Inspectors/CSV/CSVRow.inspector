@@ -67,7 +67,7 @@
     <LocalizedDictionary>
         <Localized key="row_index" lang="French" value="index de ligne"/>
         <Localized key="cell_count" lang="French" value="nombre de cellules"/>
-        <Localized key="document" lang="French" value="document"/>
+        <Localized key="document" lang="French" value="Document"/>
     </LocalizedDictionary>
 
     <Parameter name="title" value="CSV Row"/>

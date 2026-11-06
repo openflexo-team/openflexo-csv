@@ -1,9 +1,9 @@
-Default=Default
-Private=Private
-Protected=Protected
+Default=Par d\u00e9faut
+Private=Priv\u00e9
+Protected=Prot\u00e9g\u00e9
 Public=Public
-author=author
-line_number=line_number
-object_type=object_type
-viewpoint=viewpoint
-visibility=visibility
+author=Auteur
+line_number=Num\u00e9ro de ligne
+object_type=Type d'objet
+viewpoint=VirtualModel
+visibility=Visibilit\u00e9

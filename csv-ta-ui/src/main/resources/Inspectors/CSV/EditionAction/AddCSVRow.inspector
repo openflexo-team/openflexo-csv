@@ -55,7 +55,7 @@
     </TabPanel>
 
     <LocalizedDictionary>
-        <Localized key="document" lang="French" value="document"/>
+        <Localized key="document" lang="French" value="Document"/>
         <Localized key="row_index" lang="French" value="index de ligne"/>
     </LocalizedDictionary>
 

@@ -53,7 +53,7 @@
     </TabPanel>
 
     <LocalizedDictionary>
-        <Localized key="document" lang="French" value="document"/>
+        <Localized key="document" lang="French" value="Document"/>
         <Localized key="row_(optional)" lang="French" value="ligne (optionnel)"/>
     </LocalizedDictionary>
 
