@@ -64,8 +64,6 @@
     </TabPanel>
 
     <LocalizedDictionary>
-        <Localized key="Advanced" lang="French" value="Avancé"/>
-        <Localized key="Basic" lang="French" value="Basique"/>
         <Localized key="document" lang="French" value="document"/>
     </LocalizedDictionary>
 

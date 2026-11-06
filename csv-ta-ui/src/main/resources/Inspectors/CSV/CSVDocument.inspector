@@ -76,11 +76,8 @@
     </TabPanel>
 
     <LocalizedDictionary>
-        <Localized key="Advanced" lang="French" value="Avancé"/>
-        <Localized key="Basic" lang="French" value="Basique"/>
         <Localized key="name" lang="French" value="nom"/>
         <Localized key="row_count" lang="French" value="nombre de lignes"/>
-        <Localized key="uri" lang="French" value="URI"/>
     </LocalizedDictionary>
 
     <Parameter name="title" value="CSV Document"/>

@@ -110,8 +110,6 @@
                  type="org.openflexo.ta.csv.fml.editionaction.AddCSVCell"/>
 
     <LocalizedDictionary id="27">
-        <Localized id="28" value="Avancé" lang="French" key="Advanced"/>
-        <Localized id="29" value="Basique" lang="French" key="Basic"/>
         <Localized id="30" value="ligne" lang="French" key="row"/>
         <Localized id="31" value="index de colonne" lang="French" key="column_index"/>
         <Localized id="32" value="valeur" lang="French" key="value"/>

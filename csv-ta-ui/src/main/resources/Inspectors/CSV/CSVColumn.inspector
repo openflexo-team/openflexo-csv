@@ -79,7 +79,6 @@
     </TabPanel>
 
     <LocalizedDictionary>
-        <Localized key="Basic" lang="French" value="Basique"/>
         <Localized key="name" lang="French" value="nom"/>
         <Localized key="column_index" lang="French" value="index de colonne"/>
         <Localized key="data_type" lang="French" value="type de données"/>

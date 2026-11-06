@@ -64,7 +64,6 @@
     </TabPanel>
 
     <LocalizedDictionary>
-        <Localized key="Basic" lang="French" value="Basique"/>
         <Localized key="value" lang="French" value="valeur"/>
         <Localized key="column_index" lang="French" value="index de colonne"/>
         <Localized key="row_index" lang="French" value="index de ligne"/>
