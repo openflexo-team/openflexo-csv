@@ -54,7 +54,6 @@ import org.openflexo.pamela.annotations.ImplementationClass;
 import org.openflexo.pamela.annotations.ModelEntity;
 import org.openflexo.pamela.annotations.PropertyIdentifier;
 import org.openflexo.pamela.annotations.Setter;
-import org.openflexo.pamela.annotations.XMLAttribute;
 import org.openflexo.ta.csv.CSVModelSlot;
 import org.openflexo.ta.csv.model.CSVCell;
 import org.openflexo.ta.csv.model.CSVDocument;
@@ -73,7 +72,6 @@ public interface AbstractSelectCSVCell<AT> extends AbstractFetchRequest<CSVModel
 
     
     @Getter(value = CSV_DOCUMENT_KEY)
-    @XMLAttribute
     @FMLAttribute(value = CSV_DOCUMENT_KEY)
     public DataBinding<CSVDocument> getCSVDocument();
 
@@ -82,7 +80,6 @@ public interface AbstractSelectCSVCell<AT> extends AbstractFetchRequest<CSVModel
 
     
     @Getter(value = CSV_ROW_KEY)
-    @XMLAttribute
     @FMLAttribute(value = CSV_ROW_KEY)
     public DataBinding<CSVRow> getCSVRow();
 

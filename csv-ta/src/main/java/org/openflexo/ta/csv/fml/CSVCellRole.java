@@ -48,13 +48,11 @@ import org.openflexo.foundation.fml.rt.FlexoConceptInstance;
 import org.openflexo.foundation.technologyadapter.TechnologyAdapter;
 import org.openflexo.pamela.annotations.ImplementationClass;
 import org.openflexo.pamela.annotations.ModelEntity;
-import org.openflexo.pamela.annotations.XMLElement;
 import org.openflexo.ta.csv.CSVTechnologyAdapter;
 import org.openflexo.ta.csv.model.CSVCell;
 
 @ModelEntity
 @ImplementationClass(CSVCellRole.CSVCellRoleImpl.class)
-@XMLElement
 @FML("CSVCellRole")
 public interface CSVCellRole extends FlexoRole<CSVCell> {
 

@@ -42,7 +42,6 @@ import org.openflexo.foundation.fml.editionaction.FetchRequest;
 import org.openflexo.foundation.fml.editionaction.UniqueFetchRequest;
 import org.openflexo.pamela.annotations.ImplementationClass;
 import org.openflexo.pamela.annotations.ModelEntity;
-import org.openflexo.pamela.annotations.XMLElement;
 import org.openflexo.ta.csv.CSVModelSlot;
 import org.openflexo.ta.csv.model.CSVDocument;
 import org.openflexo.ta.csv.model.CSVRow;
@@ -50,7 +49,6 @@ import org.openflexo.ta.csv.model.CSVRow;
 
 @ModelEntity
 @ImplementationClass(AbstractSelectCSVRow.AbstractSelectCSVRowImpl.class)
-@XMLElement
 @FML("SelectUniqueCSVRow")
 public interface SelectUniqueCSVRow extends AbstractSelectCSVRow<CSVRow>, UniqueFetchRequest<CSVModelSlot, CSVDocument, CSVRow> {
 

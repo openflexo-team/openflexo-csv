@@ -84,7 +84,6 @@ import org.openflexo.ta.csv.rm.CSVResource;
 })
 @ModelEntity
 @ImplementationClass(CSVModelSlot.CSVModelSlotImpl.class)
-@XMLElement
 @FML("CSVModelSlot")
 public interface CSVModelSlot extends FreeModelSlot<CSVDocument, CSVResource> {
 
@@ -108,7 +107,6 @@ public interface CSVModelSlot extends FreeModelSlot<CSVDocument, CSVResource> {
 
 
 	@Getter(value = TEMPLATE_CSV_URI_KEY)
-	@XMLAttribute
 	public String getTemplateCSVURI();
 
 
@@ -125,7 +123,6 @@ public interface CSVModelSlot extends FreeModelSlot<CSVDocument, CSVResource> {
 
 
 	@Getter(value = DELIMITER_KEY, defaultValue = ",")
-	@XMLAttribute
 	public String getDelimiter();
 
 	@Setter(DELIMITER_KEY)
@@ -133,7 +130,6 @@ public interface CSVModelSlot extends FreeModelSlot<CSVDocument, CSVResource> {
 
 
 	@Getter(value = ENCODING_KEY, defaultValue = "UTF-8")
-	@XMLAttribute
 	public String getEncoding();
 
 
@@ -141,7 +137,6 @@ public interface CSVModelSlot extends FreeModelSlot<CSVDocument, CSVResource> {
 	public void setEncoding(String encoding);
 
 	@Getter(value = HAS_HEADER_KEY, defaultValue = "true")
-	@XMLAttribute
 	public boolean getHasHeader();
 
 	@Setter(HAS_HEADER_KEY)

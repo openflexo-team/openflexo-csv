@@ -43,7 +43,6 @@ import org.openflexo.foundation.fml.annotations.FML;
 import org.openflexo.foundation.fml.editionaction.FetchRequest;
 import org.openflexo.pamela.annotations.ImplementationClass;
 import org.openflexo.pamela.annotations.ModelEntity;
-import org.openflexo.pamela.annotations.XMLElement;
 import org.openflexo.ta.csv.CSVModelSlot;
 import org.openflexo.ta.csv.model.CSVCell;
 import org.openflexo.ta.csv.model.CSVDocument;
@@ -51,7 +50,6 @@ import org.openflexo.ta.csv.model.CSVDocument;
 
 @ModelEntity
 @ImplementationClass(AbstractSelectCSVCell.AbstractSelectCSVCellImpl.class)
-@XMLElement
 @FML("SelectCSVCell")
 public interface SelectCSVCell extends AbstractSelectCSVCell<List<CSVCell>>, FetchRequest<CSVModelSlot, CSVDocument, CSVCell> {
 

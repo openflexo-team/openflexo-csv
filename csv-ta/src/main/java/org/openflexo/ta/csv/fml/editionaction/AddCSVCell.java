@@ -56,8 +56,6 @@ import org.openflexo.pamela.annotations.ImplementationClass;
 import org.openflexo.pamela.annotations.ModelEntity;
 import org.openflexo.pamela.annotations.PropertyIdentifier;
 import org.openflexo.pamela.annotations.Setter;
-import org.openflexo.pamela.annotations.XMLAttribute;
-import org.openflexo.pamela.annotations.XMLElement;
 import org.openflexo.ta.csv.CSVModelSlot;
 import org.openflexo.ta.csv.model.CSVCell;
 import org.openflexo.ta.csv.model.CSVDocument;
@@ -66,7 +64,6 @@ import org.openflexo.ta.csv.model.CSVRow;
 
 @ModelEntity
 @ImplementationClass(AddCSVCell.AddCSVCellImpl.class)
-@XMLElement
 @FML("AddCSVCell")
 public interface AddCSVCell extends CSVAction<CSVCell> {
 
@@ -93,7 +90,6 @@ public interface AddCSVCell extends CSVAction<CSVCell> {
 
     
     @Getter(value = ROW_KEY)
-    @XMLAttribute
     @FMLAttribute(value = ROW_KEY)
     public DataBinding<CSVRow> getRow();
 
@@ -102,7 +98,6 @@ public interface AddCSVCell extends CSVAction<CSVCell> {
 
     
     @Getter(value = VALUE_KEY)
-    @XMLAttribute
     @FMLAttribute(value = VALUE_KEY)
     public DataBinding<Object> getValue();
 
@@ -111,7 +106,6 @@ public interface AddCSVCell extends CSVAction<CSVCell> {
 
     
     @Getter(value = COLUMN_INDEX_KEY)
-    @XMLAttribute
     @FMLAttribute(value = COLUMN_INDEX_KEY)
     public DataBinding<Integer> getColumnIndex();
 
@@ -120,7 +114,6 @@ public interface AddCSVCell extends CSVAction<CSVCell> {
 
     
     @Getter(value = ROW_INDEX_KEY)
-    @XMLAttribute
     @FMLAttribute(value = ROW_INDEX_KEY)
     public DataBinding<Integer> getRowIndex();
 
@@ -129,7 +122,6 @@ public interface AddCSVCell extends CSVAction<CSVCell> {
 
     
     @Getter(value = CSV_DOCUMENT_KEY)
-    @XMLAttribute
     @FMLAttribute(value = CSV_DOCUMENT_KEY)
     public DataBinding<CSVDocument> getCSVDocument();
 
@@ -138,7 +130,6 @@ public interface AddCSVCell extends CSVAction<CSVCell> {
 
     
     @Getter(value = IS_ROW_INDEX_KEY, defaultValue = "false")
-    @XMLAttribute
     public boolean isRowIndex();
 
     @Setter(IS_ROW_INDEX_KEY)
@@ -146,7 +137,6 @@ public interface AddCSVCell extends CSVAction<CSVCell> {
 
     
     @Getter(value = CELL_TO_COPY_KEY)
-    @XMLAttribute
     public DataBinding<CSVCell> getCellToCopy();
 
     @Setter(CELL_TO_COPY_KEY)

@@ -57,8 +57,6 @@ import org.openflexo.pamela.annotations.ImplementationClass;
 import org.openflexo.pamela.annotations.ModelEntity;
 import org.openflexo.pamela.annotations.PropertyIdentifier;
 import org.openflexo.pamela.annotations.Setter;
-import org.openflexo.pamela.annotations.XMLAttribute;
-import org.openflexo.pamela.annotations.XMLElement;
 import org.openflexo.ta.csv.CSVModelSlot;
 import org.openflexo.ta.csv.model.CSVCell;
 import org.openflexo.ta.csv.model.CSVDocument;
@@ -67,7 +65,6 @@ import org.openflexo.ta.csv.model.CSVRow;
 
 @ModelEntity
 @ImplementationClass(AddCSVRow.AddCSVRowImpl.class)
-@XMLElement
 @FML("AddCSVRow")
 public interface AddCSVRow extends CSVAction<CSVRow> {
 
@@ -82,7 +79,6 @@ public interface AddCSVRow extends CSVAction<CSVRow> {
 
 	
 	@Getter(value = CSV_DOCUMENT_KEY)
-	@XMLAttribute
 	@FMLAttribute(value = CSV_DOCUMENT_KEY)
 	public DataBinding<CSVDocument> getCSVDocument();
 
@@ -91,7 +87,6 @@ public interface AddCSVRow extends CSVAction<CSVRow> {
 
 	
 	@Getter(value = CSV_CELLS_KEY)
-	@XMLAttribute
 	@FMLAttribute(value = CSV_CELLS_KEY)
 	public DataBinding<List<CSVCell>> getCSVCells();
 
@@ -100,7 +95,6 @@ public interface AddCSVRow extends CSVAction<CSVRow> {
 
 	
 	@Getter(value = ROW_INDEX_KEY)
-	@XMLAttribute
 	@FMLAttribute(value = ROW_INDEX_KEY)
 	public DataBinding<Integer> getRowIndex();
 

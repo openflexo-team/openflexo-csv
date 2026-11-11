@@ -53,7 +53,6 @@ import org.openflexo.foundation.resource.ResourceLoadingCancelledException;
 import org.openflexo.foundation.resource.SaveResourceException;
 import org.openflexo.pamela.annotations.ImplementationClass;
 import org.openflexo.pamela.annotations.ModelEntity;
-import org.openflexo.pamela.annotations.XMLElement;
 import org.openflexo.pamela.exceptions.ModelDefinitionException;
 import org.openflexo.ta.csv.CSVModelSlot;
 import org.openflexo.ta.csv.CSVTechnologyAdapter;
@@ -64,7 +63,6 @@ import org.openflexo.ta.csv.rm.CSVResourceFactory;
 
 @ModelEntity
 @ImplementationClass(CreateCSVResource.CreateCSVResourceImpl.class)
-@XMLElement
 @FML("CreateCSVResource")
 public interface CreateCSVResource extends AbstractCreateResource<CSVModelSlot, CSVDocument, CSVTechnologyAdapter> {
 
