@@ -37,6 +37,7 @@
 
 package org.openflexo.ta.csv.fml.editionaction;
 
+import org.openflexo.foundation.fml.rt.error.FMLExecutionException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -91,7 +92,7 @@ public interface AbstractSelectCSVRow<AT> extends AbstractFetchRequest<CSVModelS
 		}
 
 		@Override
-		public List<CSVRow> performExecute(RunTimeEvaluationContext evaluationContext) {
+		public List<CSVRow> performExecute(RunTimeEvaluationContext evaluationContext) throws FMLExecutionException {
 
 			CSVDocument document = getReceiver(evaluationContext);
 
