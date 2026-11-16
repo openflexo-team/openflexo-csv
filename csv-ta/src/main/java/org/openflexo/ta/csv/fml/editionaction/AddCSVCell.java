@@ -42,9 +42,11 @@ import java.lang.reflect.Type;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.openflexo.foundation.fml.rt.error.FMLTechnologyError;
+import org.openflexo.foundation.fml.rt.error.FMLNullReferenceError;
+import org.openflexo.foundation.fml.rt.error.FMLEvaluation;
+import org.openflexo.foundation.fml.rt.error.FMLExecutionException;
 import org.openflexo.connie.DataBinding;
-import org.openflexo.connie.exception.NullReferenceException;
-import org.openflexo.connie.exception.TypeMismatchException;
 import org.openflexo.foundation.fml.annotations.FML;
 import org.openflexo.foundation.fml.annotations.FMLAttribute;
 import org.openflexo.foundation.fml.editionaction.TechnologySpecificActionDefiningReceiver.TechnologySpecificActionDefiningReceiverImpl;
@@ -165,160 +167,58 @@ public interface AddCSVCell extends CSVAction<CSVCell> {
         }
 
         @Override
-        public CSVCell execute(RunTimeEvaluationContext evaluationContext) {
+        public CSVCell execute(RunTimeEvaluationContext evaluationContext) throws FMLExecutionException {
 
-            CSVCell csvCell = null;
-
-            try {
-                CSVRow csvRow = null;
-
-                // Get the row - either by index or direct binding
-                if (isRowIndex()) {
-                    Integer rowIndex = getRowIndex().getBindingValue(evaluationContext);
-                    CSVDocument document = getCSVDocument().getBindingValue(evaluationContext);
-
-                    if (document != null && rowIndex != null) {
-                        csvRow = document.getRowAt(rowIndex);
-
-                        if (csvRow == null) {
-                            if (logger.isLoggable(Level.WARNING)) {
-                                logger.warning("Row not found at index " + rowIndex);
-                            }
-                        }
-                    }
-                    else if (document == null) {
-                        if (logger.isLoggable(Level.WARNING)) {
-                            logger.warning("Cannot add cell: CSV document is null");
-                        }
-                    }
-                    else if (rowIndex == null) {
-                        if (logger.isLoggable(Level.WARNING)) {
-                            logger.warning("Cannot add cell: row index is null");
-                        }
-                    }
+            // The row: by index in a document, or given
+            CSVRow csvRow;
+            if (isRowIndex()) {
+                CSVDocument document = FMLEvaluation.evaluate(getCSVDocument(), evaluationContext, this);
+                if (document == null) {
+                    throw new FMLNullReferenceError("Cannot add cell: CSV document is null");
                 }
-                else {
-                    csvRow = getRow().getBindingValue(evaluationContext);
-
-                    if (csvRow == null) {
-                        if (logger.isLoggable(Level.WARNING)) {
-                            logger.warning("Cannot add cell: row is null");
-                        }
-                    }
+                Integer rowIndex = FMLEvaluation.evaluate(getRowIndex(), evaluationContext, this);
+                if (rowIndex == null) {
+                    throw new FMLNullReferenceError("Cannot add cell: row index is null");
                 }
-
+                csvRow = document.getRowAt(rowIndex);
                 if (csvRow == null) {
-                    return null;
+                    throw new FMLTechnologyError("Cannot add cell: no row at index " + rowIndex);
                 }
-
-                if (logger.isLoggable(Level.FINE)) {
-                    logger.fine("Adding cell to row at index " + csvRow.getRowIndex());
+            }
+            else {
+                csvRow = FMLEvaluation.evaluate(getRow(), evaluationContext, this);
+                if (csvRow == null) {
+                    throw new FMLNullReferenceError("Cannot add cell: row is null");
                 }
-
-                // Get column index
-                Integer columnIndex = getColumnIndex().getBindingValue(evaluationContext);
-
-                if (columnIndex == null) {
-                    if (logger.isLoggable(Level.WARNING)) {
-                        logger.warning("Cannot add cell: column index is null");
-                    }
-                    return null;
-                }
-
-                if (columnIndex < 0) {
-                    if (logger.isLoggable(Level.WARNING)) {
-                        logger.warning("Cannot add cell: column index must be non-negative, got " + columnIndex);
-                    }
-                    return null;
-                }
-
-                // Check if cell already exists at this column
-                csvCell = csvRow.getCellAt(columnIndex);
-
-                if (csvCell != null) {
-                    if (logger.isLoggable(Level.FINE)) {
-                        logger.fine("Cell already exists at column " + columnIndex + ", updating value");
-                    }
-                }
-                else {
-                    // Create new cell
-                    Object value = getValue().getBindingValue(evaluationContext);
-                    String cellValue = (value != null) ? value.toString() : "";
-
-                    csvCell = csvRow.getCSVDocument().getResource().getFactory().makeCSVCell(cellValue, columnIndex);
-
-                    if (csvCell == null) {
-                        if (logger.isLoggable(Level.SEVERE)) {
-                            logger.severe("Failed to create CSVCell at column " + columnIndex);
-                        }
-                        return null;
-                    }
-
-                    // Set bidirectional relationships
-                    csvCell.setCSVRow(csvRow);
-                    csvRow.addToCells(csvCell);
-
-                    if (logger.isLoggable(Level.INFO)) {
-                        logger.info("Created new CSVCell at row " + csvRow.getRowIndex() + ", column " + columnIndex);
-                    }
-                }
-
-                // Copy from another cell if specified
-                if (getCellToCopy() != null && getCellToCopy().isValid()) {
-                    CSVCell cellToCopy = getCellToCopy().getBindingValue(evaluationContext);
-
-                    if (cellToCopy != null) {
-                        csvCell.setValue(cellToCopy.getValue());
-
-                        if (logger.isLoggable(Level.FINE)) {
-                            logger.fine("Copied value from cell: " + cellToCopy.getValue());
-                        }
-                    }
-                }
-
-                // Set value if not copying
-                if (getValue() != null && getValue().isValid()) {
-                    Object value = getValue().getBindingValue(evaluationContext);
-
-                    if (value != null) {
-                        csvCell.setValue(value.toString());
-
-                        if (logger.isLoggable(Level.FINEST)) {
-                            logger.finest("Set cell value to: " + value);
-                        }
-                    }
-                    else {
-                        if (logger.isLoggable(Level.FINE)) {
-                            logger.fine("Value is null, cell will have empty value");
-                        }
-                    }
-                }
-
-                // Mark document as modified
-                csvRow.getCSVDocument().getResource().setModified(true);
-
-            } catch (TypeMismatchException e) {
-                if (logger.isLoggable(Level.SEVERE)) {
-                    logger.severe("Type mismatch in AddCSVCell: " + e.getMessage());
-                }
-                e.printStackTrace();
-            } catch (NullReferenceException e) {
-                if (logger.isLoggable(Level.SEVERE)) {
-                    logger.severe("Null reference in AddCSVCell: " + e.getMessage());
-                }
-                e.printStackTrace();
-            } catch (ReflectiveOperationException e) {
-                if (logger.isLoggable(Level.SEVERE)) {
-                    logger.severe("Reflection error in AddCSVCell: " + e.getMessage());
-                }
-                e.printStackTrace();
-            } catch (Exception e) {
-                if (logger.isLoggable(Level.SEVERE)) {
-                    logger.severe("Unexpected error in AddCSVCell: " + e.getMessage());
-                }
-                e.printStackTrace();
             }
 
+            Integer columnIndex = FMLEvaluation.evaluate(getColumnIndex(), evaluationContext, this);
+            if (columnIndex == null) {
+                throw new FMLNullReferenceError("Cannot add cell: column index is null");
+            }
+            if (columnIndex < 0) {
+                throw new FMLTechnologyError("Cannot add cell: column index must be non-negative, got " + columnIndex);
+            }
+            Object value = FMLEvaluation.evaluate(getValue(), evaluationContext, this);
+            CSVCell cellToCopy = getCellToCopy() != null && getCellToCopy().isSet()
+                    ? FMLEvaluation.evaluate(getCellToCopy(), evaluationContext, this)
+                    : null;
+
+            // The cell at this column is updated when it exists
+            CSVCell csvCell = csvRow.getCellAt(columnIndex);
+            if (csvCell == null) {
+                csvCell = csvRow.getCSVDocument().getResource().getFactory().makeCSVCell(value != null ? value.toString() : "", columnIndex);
+                csvCell.setCSVRow(csvRow);
+                csvRow.addToCells(csvCell);
+            }
+            if (cellToCopy != null) {
+                csvCell.setValue(cellToCopy.getValue());
+            }
+            // A null value leaves the cell as it is
+            if (value != null) {
+                csvCell.setValue(value.toString());
+            }
+            csvRow.getCSVDocument().getResource().setModified(true);
             return csvCell;
         }
 

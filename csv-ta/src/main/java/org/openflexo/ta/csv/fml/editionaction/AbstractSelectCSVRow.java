@@ -37,6 +37,8 @@
 
 package org.openflexo.ta.csv.fml.editionaction;
 
+import org.openflexo.foundation.fml.rt.error.FMLNullReferenceError;
+import org.openflexo.foundation.fml.rt.error.FMLEvaluation;
 import org.openflexo.foundation.fml.rt.error.FMLExecutionException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -45,8 +47,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.openflexo.connie.DataBinding;
-import org.openflexo.connie.exception.NullReferenceException;
-import org.openflexo.connie.exception.TypeMismatchException;
 import org.openflexo.foundation.fml.annotations.FMLAttribute;
 import org.openflexo.foundation.fml.editionaction.AbstractFetchRequest;
 import org.openflexo.foundation.fml.rt.RunTimeEvaluationContext;
@@ -94,81 +94,22 @@ public interface AbstractSelectCSVRow<AT> extends AbstractFetchRequest<CSVModelS
 		@Override
 		public List<CSVRow> performExecute(RunTimeEvaluationContext evaluationContext) throws FMLExecutionException {
 
-			CSVDocument document = getReceiver(evaluationContext);
-
-			if (logger.isLoggable(Level.FINEST)) {
-				logger.finest("AbstractSelectCSVRow.performExecute() called");
-				logger.finest("Receiver document: " + document);
+			CSVDocument document;
+			if (getCSVDocument() != null && getCSVDocument().isSet()) {
+				document = FMLEvaluation.evaluate(getCSVDocument(), evaluationContext, this);
 			}
-
+			else {
+				document = getReceiver(evaluationContext);
+			}
+			if (document == null) {
+				// A null source (CORE-F-11)
+				throw new FMLNullReferenceError(getStringRepresentation() + ": no CSV document to select from");
+			}
 			List<CSVRow> selectedRows = new ArrayList<>();
-
-			try {
-				// If specific document binding is provided, use it
-				if (getCSVDocument() != null && getCSVDocument().isValid()) {
-					CSVDocument specificDocument = getCSVDocument().getBindingValue(evaluationContext);
-
-					if (specificDocument != null) {
-						if (specificDocument.getRows() != null) {
-							selectedRows.addAll(specificDocument.getRows());
-
-							if (logger.isLoggable(Level.FINE)) {
-								logger.fine("Selected " + selectedRows.size() + " rows from specific document");
-							}
-						}
-					}
-					else {
-						if (logger.isLoggable(Level.WARNING)) {
-							logger.warning("Specific document binding evaluated to null");
-						}
-					}
-				}
-				// Otherwise use receiver document
-				else if (document != null) {
-					if (document.getRows() != null) {
-						selectedRows.addAll(document.getRows());
-
-						if (logger.isLoggable(Level.FINE)) {
-							logger.fine("Selected " + selectedRows.size() + " rows from receiver document");
-						}
-					}
-				}
-				else {
-					if (logger.isLoggable(Level.WARNING)) {
-						logger.warning("No document available for row selection");
-					}
-				}
-
-			} catch (TypeMismatchException e) {
-				if (logger.isLoggable(Level.SEVERE)) {
-					logger.severe("Type mismatch in AbstractSelectCSVRow: " + e.getMessage());
-				}
-				e.printStackTrace();
-			} catch (NullReferenceException e) {
-				if (logger.isLoggable(Level.SEVERE)) {
-					logger.severe("Null reference in AbstractSelectCSVRow: " + e.getMessage());
-				}
-				e.printStackTrace();
-			} catch (ReflectiveOperationException e) {
-				if (logger.isLoggable(Level.SEVERE)) {
-					logger.severe("Reflection error in AbstractSelectCSVRow: " + e.getMessage());
-				}
-				e.printStackTrace();
-			} catch (Exception e) {
-				if (logger.isLoggable(Level.SEVERE)) {
-					logger.severe("Unexpected error in AbstractSelectCSVRow: " + e.getMessage());
-				}
-				e.printStackTrace();
+			if (document.getRows() != null) {
+				selectedRows.addAll(document.getRows());
 			}
-
-			// Apply conditions filter
-			List<CSVRow> returned = filterWithConditions(selectedRows, evaluationContext);
-
-			if (logger.isLoggable(Level.FINE)) {
-				logger.fine("After filtering: " + returned.size() + " rows");
-			}
-
-			return returned;
+			return filterWithConditions(selectedRows, evaluationContext);
 		}
 
 		@Override

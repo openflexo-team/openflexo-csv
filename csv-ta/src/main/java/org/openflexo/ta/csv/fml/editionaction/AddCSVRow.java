@@ -43,9 +43,11 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.openflexo.foundation.fml.rt.error.FMLTechnologyError;
+import org.openflexo.foundation.fml.rt.error.FMLNullReferenceError;
+import org.openflexo.foundation.fml.rt.error.FMLEvaluation;
+import org.openflexo.foundation.fml.rt.error.FMLExecutionException;
 import org.openflexo.connie.DataBinding;
-import org.openflexo.connie.exception.NullReferenceException;
-import org.openflexo.connie.exception.TypeMismatchException;
 import org.openflexo.foundation.fml.annotations.FML;
 import org.openflexo.foundation.fml.annotations.FMLAttribute;
 import org.openflexo.foundation.fml.editionaction.TechnologySpecificActionDefiningReceiver.TechnologySpecificActionDefiningReceiverImpl;
@@ -118,115 +120,39 @@ public interface AddCSVRow extends CSVAction<CSVRow> {
 		}
 
 		@Override
-		public CSVRow execute(RunTimeEvaluationContext evaluationContext) {
+		public CSVRow execute(RunTimeEvaluationContext evaluationContext) throws FMLExecutionException {
 
-			CSVRow csvRow = null;
-
-			try {
-				// Get CSV document from binding
-				CSVDocument document = getCSVDocument().getBindingValue(evaluationContext);
-
-				if (document == null) {
-					if (logger.isLoggable(Level.WARNING)) {
-						logger.warning("Cannot add row: CSV document is null");
-					}
-					return null;
-				}
-
-				// Get row index from binding
-				Integer rowIndex = getRowIndex().getBindingValue(evaluationContext);
-
-				if (rowIndex == null) {
-					if (logger.isLoggable(Level.WARNING)) {
-						logger.warning("Cannot add row: row index is null");
-					}
-					return null;
-				}
-
-				// Validate row index is non-negative
-				if (rowIndex < 0) {
-					if (logger.isLoggable(Level.WARNING)) {
-						logger.warning("Cannot add row: row index must be non-negative, got " + rowIndex);
-					}
-					return null;
-				}
-
-				// Check if row already exists at this index
-				if (rowIndex < document.getRowCount()) {
-					csvRow = document.getRowAt(rowIndex);
-					if (csvRow != null) {
-						if (logger.isLoggable(Level.FINE)) {
-							logger.fine("Row already exists at index " + rowIndex + ", returning existing row");
-						}
-					}
-				}
-
-				// Create new row if it doesn't exist
-				if (csvRow == null) {
-					csvRow = document.getResource().getFactory().makeCSVRow(rowIndex);
-
-					if (csvRow == null) {
-						if (logger.isLoggable(Level.SEVERE)) {
-							logger.severe("Failed to create CSVRow at index " + rowIndex);
-						}
-						return null;
-					}
-
-					// Set bidirectional relationship
-					csvRow.setCSVDocument(document);
-					document.addToRows(csvRow);
-
-					if (logger.isLoggable(Level.INFO)) {
-						logger.info("Created new CSVRow at index " + rowIndex);
-					}
-				}
-
-				// Add cells if provided
-				if (getCSVCells() != null && getCSVCells().isValid()) {
-					List<CSVCell> cells = getCSVCells().getBindingValue(evaluationContext);
-					if (cells != null && !cells.isEmpty()) {
-						for (CSVCell cell : cells) {
-							if (cell != null) {
-								csvRow.addToCells(cell);
-								cell.setCSVRow(csvRow);
-							}
-						}
-
-						if (logger.isLoggable(Level.FINE)) {
-							logger.fine("Added " + cells.size() + " cells to row " + rowIndex);
-						}
-					}
-				}
-
-				// Mark document as modified
-				document.getResource().setModified(true);
-
-				if (logger.isLoggable(Level.FINEST)) {
-					logger.finest("Row " + rowIndex + " has " + csvRow.getCellCount() + " cells");
-				}
-
-			} catch (TypeMismatchException e) {
-				if (logger.isLoggable(Level.SEVERE)) {
-					logger.severe("Type mismatch in AddCSVRow: " + e.getMessage());
-				}
-				e.printStackTrace();
-			} catch (NullReferenceException e) {
-				if (logger.isLoggable(Level.SEVERE)) {
-					logger.severe("Null reference in AddCSVRow: " + e.getMessage());
-				}
-				e.printStackTrace();
-			} catch (ReflectiveOperationException e) {
-				if (logger.isLoggable(Level.SEVERE)) {
-					logger.severe("Reflection error in AddCSVRow: " + e.getMessage());
-				}
-				e.printStackTrace();
-			} catch (Exception e) {
-				if (logger.isLoggable(Level.SEVERE)) {
-					logger.severe("Unexpected error in AddCSVRow: " + e.getMessage());
-				}
-				e.printStackTrace();
+			CSVDocument document = FMLEvaluation.evaluate(getCSVDocument(), evaluationContext, this);
+			if (document == null) {
+				throw new FMLNullReferenceError("Cannot add row: CSV document is null");
 			}
+			Integer rowIndex = FMLEvaluation.evaluate(getRowIndex(), evaluationContext, this);
+			if (rowIndex == null) {
+				throw new FMLNullReferenceError("Cannot add row: row index is null");
+			}
+			if (rowIndex < 0) {
+				throw new FMLTechnologyError("Cannot add row: row index must be non-negative, got " + rowIndex);
+			}
+			List<CSVCell> cells = getCSVCells() != null && getCSVCells().isSet()
+					? FMLEvaluation.evaluate(getCSVCells(), evaluationContext, this)
+					: null;
 
+			// The row at this index is returned when it exists
+			CSVRow csvRow = rowIndex < document.getRowCount() ? document.getRowAt(rowIndex) : null;
+			if (csvRow == null) {
+				csvRow = document.getResource().getFactory().makeCSVRow(rowIndex);
+				csvRow.setCSVDocument(document);
+				document.addToRows(csvRow);
+			}
+			if (cells != null) {
+				for (CSVCell cell : cells) {
+					if (cell != null) {
+						csvRow.addToCells(cell);
+						cell.setCSVRow(csvRow);
+					}
+				}
+			}
+			document.getResource().setModified(true);
 			return csvRow;
 		}
 

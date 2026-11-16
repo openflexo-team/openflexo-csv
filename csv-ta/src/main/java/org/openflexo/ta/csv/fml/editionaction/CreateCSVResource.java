@@ -46,6 +46,10 @@ import org.openflexo.foundation.FlexoException;
 import org.openflexo.foundation.fml.annotations.FML;
 import org.openflexo.foundation.fml.editionaction.AbstractCreateResource;
 import org.openflexo.foundation.fml.editionaction.EditionAction;
+import org.openflexo.foundation.fml.rt.error.FMLCancellation;
+import org.openflexo.foundation.fml.rt.error.FMLInternalError;
+import org.openflexo.foundation.fml.rt.error.FMLNullReferenceError;
+import org.openflexo.foundation.fml.rt.error.FMLTechnologyError;
 import org.openflexo.foundation.fml.rt.error.FMLExecutionException;
 import org.openflexo.foundation.fml.rt.RunTimeEvaluationContext;
 import org.openflexo.foundation.resource.FlexoResourceCenter;
@@ -79,120 +83,38 @@ public interface CreateCSVResource extends AbstractCreateResource<CSVModelSlot, 
         @Override
         public CSVDocument execute(RunTimeEvaluationContext evaluationContext) throws FMLExecutionException {
 
-            if (logger.isLoggable(Level.INFO)) {
-                logger.info("Creating new CSV resource");
-            }
-
             String resourceName = getResourceName(evaluationContext);
-            String resourceURI = getResourceURI(evaluationContext);
-            FlexoResourceCenter<?> rc = getResourceCenter(evaluationContext);
-
-            if (logger.isLoggable(Level.FINE)) {
-                logger.fine("Resource name: " + resourceName);
-                logger.fine("Resource URI: " + resourceURI);
-                logger.fine("Resource center: " + rc);
-            }
-
             if (resourceName == null || resourceName.isEmpty()) {
-                String errorMsg = "Cannot create CSV resource: resource name is null or empty";
-                if (logger.isLoggable(Level.SEVERE)) {
-                    logger.severe(errorMsg);
-                }
-                throw new FMLExecutionException(errorMsg);
+                throw new FMLNullReferenceError("Cannot create CSV resource: resource name is null or empty");
             }
-
+            String resourceURI = getResourceURI(evaluationContext);
             if (resourceURI == null || resourceURI.isEmpty()) {
-                String errorMsg = "Cannot create CSV resource: resource URI is null or empty";
-                if (logger.isLoggable(Level.SEVERE)) {
-                    logger.severe(errorMsg);
-                }
-                throw new FMLExecutionException(errorMsg);
+                throw new FMLNullReferenceError("Cannot create CSV resource: resource URI is null or empty");
             }
-
-            if (rc == null) {
-                String errorMsg = "Cannot create CSV resource: resource center is null";
-                if (logger.isLoggable(Level.SEVERE)) {
-                    logger.severe(errorMsg);
-                }
-                throw new FMLExecutionException(errorMsg);
+            if (getResourceCenter(evaluationContext) == null) {
+                throw new FMLNullReferenceError("Cannot create CSV resource: resource center is null");
             }
-
-            CSVTechnologyAdapter csvTA = getServiceManager().getTechnologyAdapterService()
-                    .getTechnologyAdapter(CSVTechnologyAdapter.class);
-
-            if (csvTA == null) {
-                String errorMsg = "Cannot create CSV resource: CSV Technology Adapter not found";
-                if (logger.isLoggable(Level.SEVERE)) {
-                    logger.severe(errorMsg);
-                }
-                throw new FMLExecutionException(errorMsg);
-            }
-
-            CSVResource newResource;
+            CSVTechnologyAdapter csvTA = getServiceManager().getTechnologyAdapterService().getTechnologyAdapter(CSVTechnologyAdapter.class);
             try {
-                newResource = createResource(csvTA, CSVResourceFactory.class, evaluationContext, ".csv", true);
-
+                CSVResource newResource = createResource(csvTA, CSVResourceFactory.class, evaluationContext, ".csv", true);
                 if (newResource == null) {
-                    String errorMsg = "Failed to create CSV resource";
-                    if (logger.isLoggable(Level.SEVERE)) {
-                        logger.severe(errorMsg);
-                    }
-                    throw new FMLExecutionException(errorMsg);
+                    throw new FMLTechnologyError("Cannot create the CSV resource " + resourceName);
                 }
-
-                if (logger.isLoggable(Level.INFO)) {
-                    logger.info("Created new CSV resource: " + newResource);
-                }
-
                 newResource.setModified(true);
-
                 CSVDocument document = newResource.getResourceData();
-
                 if (document == null) {
-                    String errorMsg = "CSV resource created but document is null";
-                    if (logger.isLoggable(Level.SEVERE)) {
-                        logger.severe(errorMsg);
-                    }
-                    throw new FMLExecutionException(errorMsg);
+                    throw new FMLTechnologyError("The CSV resource " + resourceName + " was created but has no document");
                 }
-
-                if (logger.isLoggable(Level.INFO)) {
-                    logger.info("Returning CSV document: " + document);
-                }
-
                 return document;
-
+            } catch (FMLExecutionException e) {
+                // Already typed (a null name or resource center...): rethrown unchanged (CORE-F-11)
+                throw e;
             } catch (ModelDefinitionException e) {
-                if (logger.isLoggable(Level.SEVERE)) {
-                    logger.severe("Model definition error creating CSV resource: " + e.getMessage());
-                }
-                throw new FMLExecutionException(e);
-            } catch (FileNotFoundException e) {
-                if (logger.isLoggable(Level.SEVERE)) {
-                    logger.severe("File not found creating CSV resource: " + e.getMessage());
-                }
-                throw new FMLExecutionException(e);
+                throw new FMLInternalError(e);
             } catch (ResourceLoadingCancelledException e) {
-                if (logger.isLoggable(Level.SEVERE)) {
-                    logger.severe("Resource loading cancelled: " + e.getMessage());
-                }
-                throw new FMLExecutionException(e);
-            } catch (SaveResourceException e) {
-                if (logger.isLoggable(Level.SEVERE)) {
-                    logger.severe("Error saving CSV resource: " + e.getMessage());
-                }
-                throw new FMLExecutionException(e);
-            } catch (FlexoException e) {
-                if (logger.isLoggable(Level.SEVERE)) {
-                    logger.severe("Flexo exception creating CSV resource: " + e.getMessage());
-                }
-                throw new FMLExecutionException(e);
-            } catch (Exception e) {
-                if (logger.isLoggable(Level.SEVERE)) {
-                    logger.severe("Unexpected error creating CSV resource: " + e.getMessage());
-                }
-                e.printStackTrace();
-                throw new FMLExecutionException(e);
+                throw new FMLCancellation("Loading of the new CSV document was cancelled", e);
+            } catch (FileNotFoundException | FlexoException e) {
+                throw new FMLTechnologyError("Cannot create the CSV resource " + resourceName + ": " + e.getMessage(), e);
             }
         }
     }
