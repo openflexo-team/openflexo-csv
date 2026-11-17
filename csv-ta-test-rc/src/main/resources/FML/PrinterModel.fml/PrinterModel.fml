@@ -43,7 +43,7 @@ public Integer currentStepNumber;
  *   vm = new TestCSVVM(csv.resource) with (name="workflow1");
  */
 create(required Resource<CSVDocument> resource) {
-    connect sequenceData using parameters.resource;
+    connect sequenceData using resource;
     this.currentSequenceId = "";
     this.currentState = "IDLE";
     this.currentStepNumber = 0;
@@ -55,8 +55,8 @@ create(required Resource<CSVDocument> resource) {
  */
 create(required Resource<CSVDocument> sequenceResource,
        required Resource<CSVDocument> definitionsResource) {
-    connect sequenceData using parameters.sequenceResource;
-    connect actionDefinitions using parameters.definitionsResource;
+    connect sequenceData using sequenceResource;
+    connect actionDefinitions using definitionsResource;
     this.currentSequenceId = "";
     this.currentState = "IDLE";
     this.currentStepNumber = 0;
@@ -94,7 +94,7 @@ public String status;
  * Create PrinterAction from CSV row
  */
 create(CSVRow row) {
-    this.actionRow = parameters.row;
+    this.actionRow = row;
 
 
     this.sequenceId = this.actionRow.getCellAt(0).value;
@@ -226,7 +226,7 @@ public List<PrinterAction> getActionsForSequence(String sequenceId) {
     List<PrinterAction> result = new ArrayList<>();
 
     for (PrinterAction action : actionsInstances) {
-        if (action.sequenceId.equals(parameters.sequenceId)) {
+        if (action.sequenceId.equals(sequenceId)) {
             result.add(action);
         }
     }
@@ -241,8 +241,8 @@ public List<PrinterAction> getActionsByState(String state) {
     List<PrinterAction> result = new ArrayList<>();
 
     for (PrinterAction act : actionsInstances) {
-        if (act.stateBefore.equals(parameters.state) ||
-                act.stateAfter.equals(parameters.state)) {
+        if (act.stateBefore.equals(state) ||
+                act.stateAfter.equals(state)) {
             result.add(act);
         }
     }
@@ -363,8 +363,8 @@ public concept DictionaryGraph extends RootedGraph {
     }
 
     create(List<Object> roots, Map<Object,List<Object>> graph) {
-        this.graph = parameters.graph;
-        this.roots = parameters.roots;
+        this.graph = graph;
+        this.roots = roots;
     }
 
     delete() {}
@@ -378,7 +378,7 @@ public concept DictionaryGraph extends RootedGraph {
     }
 
     public List<Object> neighbors(Object vertex) {
-        List<Object> returnList = graph.getOrDefault(parameters.vertex, new ArrayList<>());
+        List<Object> returnList = graph.getOrDefault(vertex, new ArrayList<>());
         return returnList;
     }
 
@@ -414,7 +414,7 @@ public concept DictionaryGraph extends RootedGraph {
             private Map<Object,List<Object>> parents;
 
             create(RootedGraph graph) {
-                this.operand = parameters.graph;
+                this.operand = graph;
                 this.parents = new HashMap<>();
             }
 
@@ -434,16 +434,16 @@ public concept DictionaryGraph extends RootedGraph {
             }
 
             public List<Object> getOpNeighbors(Object vertex) {
-                List<Object> neighbors = this.operand.neighbors(parameters.vertex);
+                List<Object> neighbors = this.operand.neighbors(vertex);
                 return neighbors;
             }
 
             public List<Object> neighbors(Object vertex) {
-                List<Object> neighbors = this.operand.neighbors(parameters.vertex);
+                List<Object> neighbors = this.operand.neighbors(vertex);
                 for (Object n : neighbors) {
                     if (!parents.containsKey(n)) {
                         List<Object> parentList = new ArrayList<>();
-                        parentList.add(parameters.vertex);
+                        parentList.add(vertex);
                         parents.put(n, parentList);
                     }
                 }
@@ -467,8 +467,8 @@ public concept DictionaryGraph extends RootedGraph {
         public boolean found;
 
         create(Object stateCtr, boolean foundCtr) {
-            this.state = parameters.stateCtr;
-            this.found = parameters.foundCtr;
+            this.state = stateCtr;
+            this.found = foundCtr;
         }
 
         delete() {}
@@ -481,13 +481,13 @@ public concept DictionaryGraph extends RootedGraph {
             private String targetActionId;
 
             create(String actionId) {
-                this.targetActionId = parameters.actionId;
+                this.targetActionId = actionId;
             }
 
             delete() {}
 
             public boolean onEntry(Object state, Map<String,Object> opaqueData) {
-                PrinterAction pa = (PrinterAction) parameters.state;
+                PrinterAction pa = (PrinterAction) state;
                 log "Checking: " + pa.actionId + " == " + targetActionId;
                 return pa.actionId.equals(targetActionId);
             }
@@ -500,13 +500,13 @@ public concept DictionaryGraph extends RootedGraph {
             private Integer targetStep;
 
             create(int step) {
-                this.targetStep = parameters.step;
+                this.targetStep = step;
             }
 
             delete() {}
 
             public boolean onEntry(Object state, Map<String,Object> opaqueData) {
-                PrinterAction pa = (PrinterAction) parameters.state;
+                PrinterAction pa = (PrinterAction) state;
                 return pa.stepNumber.equals(targetStep);
             }
         }
@@ -518,13 +518,13 @@ public concept DictionaryGraph extends RootedGraph {
             private String targetState;
 
             create(String state) {
-                this.targetState = parameters.state;
+                this.targetState = state;
             }
 
             delete() {}
 
             public boolean onEntry(Object state, Map<String,Object> opaqueData) {
-                PrinterAction pa = (PrinterAction) parameters.state;
+                PrinterAction pa = (PrinterAction) state;
                 return pa.stateBefore.equals(targetState) || pa.stateAfter.equals(targetState);
             }
         }
@@ -539,7 +539,7 @@ public concept DictionaryGraph extends RootedGraph {
             List<PrinterAction> sortedList = new ArrayList<>();
             List<PrinterAction> tempSource = new ArrayList<>();
 
-            for (PrinterAction p : parameters.inputList) {
+            for (PrinterAction p : inputList) {
                 tempSource.add(p);
             }
 
@@ -615,16 +615,16 @@ public concept DictionaryGraph extends RootedGraph {
          * Build graph for a specific sequence ID only
          */
         public DictionaryGraph buildSequentialGraphForSequence(String sequenceId) {
-            List<PrinterAction> actions = this.getActionsForSequence(parameters.sequenceId);
+            List<PrinterAction> actions = this.getActionsForSequence(sequenceId);
 
             if (actions.isEmpty()) {
-                log "No actions found for sequence: " + parameters.sequenceId;
+                log "No actions found for sequence: " + sequenceId;
                 return new DictionaryGraph();
             }
 
             actions = this.sortPrinterActions(actions);
 
-            log "Building graph for sequence " + parameters.sequenceId +
+            log "Building graph for sequence " + sequenceId +
                     " with " + actions.size() + " steps";
 
             Map<Object,List<Object>> graph = new HashMap<>();
@@ -653,16 +653,16 @@ public concept DictionaryGraph extends RootedGraph {
          * (searchRG) terminates safely when the graph contains a cycle.
          */
         public DictionaryGraph buildCyclicGraphForSequence(String sequenceId) {
-            List<PrinterAction> actions = this.getActionsForSequence(parameters.sequenceId);
+            List<PrinterAction> actions = this.getActionsForSequence(sequenceId);
 
             if (actions.isEmpty()) {
-                log "No actions found for sequence: " + parameters.sequenceId;
+                log "No actions found for sequence: " + sequenceId;
                 return new DictionaryGraph();
             }
 
             actions = this.sortPrinterActions(actions);
 
-            log "Building cyclic graph for sequence " + parameters.sequenceId +
+            log "Building cyclic graph for sequence " + sequenceId +
                     " with " + actions.size() + " steps";
 
             Map<Object,List<Object>> graph = new HashMap<>();
@@ -699,9 +699,9 @@ public concept DictionaryGraph extends RootedGraph {
             Deque<Object> frontier = new ArrayDeque<>();
             Map<String,Object> opaqueData = new HashMap<>();
 
-            for (Object r : parameters.graph.roots()) {
+            for (Object r : graph.roots()) {
                 if (!known.contains(r)) {
-                    if (parameters.onEntry.onEntry(r, opaqueData)) {
+                    if (onEntry.onEntry(r, opaqueData)) {
                         log "Found at root: " + r;
                         return new SearchResult(r, true);
                     }
@@ -713,9 +713,9 @@ public concept DictionaryGraph extends RootedGraph {
             while (!frontier.isEmpty()) {
                 Object curr = frontier.removeFirst();
 
-                for (Object n : parameters.graph.neighbors(curr)) {
+                for (Object n : graph.neighbors(curr)) {
                     if (!known.contains(n)) {
-                        if (parameters.onEntry.onEntry(n, opaqueData)) {
+                        if (onEntry.onEntry(n, opaqueData)) {
                             log "Found during traversal: " + n;
                             return new SearchResult(n, true);
                         }
@@ -736,16 +736,16 @@ public concept DictionaryGraph extends RootedGraph {
          * Reconstruct path from roots to target using parent tracer
          */
         public List<Object> reconstructPath(ParentTracer tracer, Object target) {
-            Map<Object,List<Object>> parents = parameters.tracer.getParents();
+            Map<Object,List<Object>> parents = tracer.getParents();
 
-            if (!parents.containsKey(parameters.target)) {
+            if (!parents.containsKey(target)) {
                 log "Target not in parent map";
                 return new ArrayList<>();
             }
 
             List<Object> path = new ArrayList<>();
-            path.add(parameters.target);
-            this.buildPath(path, parameters.target, parents);
+            path.add(target);
+            this.buildPath(path, target, parents);
 
 
              Collections.reverse(path);
@@ -761,18 +761,18 @@ public concept DictionaryGraph extends RootedGraph {
          * Recursively build path by traversing parent relationships
          */
         public int buildPath(List<Object> path, Object current, Map<Object,List<Object>> parents) {
-            if (!parameters.parents.containsKey(parameters.current)) {
+            if (!parents.containsKey(current)) {
                 return 0;
             }
 
-            List<Object> parentList = parameters.parents.getOrDefault(parameters.current, new ArrayList<>());
+            List<Object> parentList = parents.getOrDefault(current, new ArrayList<>());
             if (parentList == null || parentList.isEmpty()) {
                 return 0;
             }
 
             for (Object parent : parentList) {
-                parameters.path.add(parent);
-                this.buildPath(parameters.path, parent, parameters.parents);
+                path.add(parent);
+                this.buildPath(path, parent, parents);
             }
 
             return 0;

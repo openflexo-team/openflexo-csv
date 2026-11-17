@@ -20,7 +20,7 @@ public model BasicModel {
 public CSVDocument csvData with CSV::CSVModelSlot();
 
 create(required Resource<CSVDocument> resource) {
-    connect csvData using parameters.resource;
+    connect csvData using resource;
 
 
     log "";
