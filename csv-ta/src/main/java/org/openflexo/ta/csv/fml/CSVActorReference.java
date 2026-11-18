@@ -41,7 +41,7 @@ package org.openflexo.ta.csv.fml;
 import java.io.FileNotFoundException;
 import java.util.logging.Logger;
 
-import org.openflexo.foundation.FlexoException;
+import org.openflexo.foundation.OpenflexoRuntimeException;
 import org.openflexo.foundation.fml.annotations.FML;
 import org.openflexo.foundation.fml.rt.ActorReference;
 import org.openflexo.foundation.fml.rt.FreeModelSlotInstance;
@@ -113,7 +113,7 @@ public interface CSVActorReference<T extends CSVObject> extends ActorReference<T
 					logger.warning("CSV file not found: " + e.getMessage());
 				} catch (ResourceLoadingCancelledException e) {
 					logger.warning("CSV resource loading cancelled: " + e.getMessage());
-				} catch (FlexoException e) {
+				} catch (OpenflexoRuntimeException e) {
 					logger.warning("Error loading CSV resource: " + e.getMessage());
 				}
 			}

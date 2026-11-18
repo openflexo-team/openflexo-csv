@@ -38,7 +38,7 @@
 
 package org.openflexo.ta.csv.model;
 
-import org.openflexo.foundation.FlexoException;
+import org.openflexo.foundation.OpenflexoRuntimeException;
 import org.openflexo.foundation.FlexoObject;
 import org.openflexo.foundation.resource.ResourceLoadingCancelledException;
 import org.openflexo.foundation.technologyadapter.TechnologyObject;
@@ -91,7 +91,7 @@ public interface CSVObject extends TechnologyObject<CSVTechnologyAdapter>, Flexo
 	}
 
 
-	public CSVDocument getDocument() throws ResourceLoadingCancelledException, FlexoException, FileNotFoundException;
+	public CSVDocument getDocument() throws ResourceLoadingCancelledException, OpenflexoRuntimeException, FileNotFoundException;
 
 
 
@@ -151,7 +151,7 @@ public interface CSVObject extends TechnologyObject<CSVTechnologyAdapter>, Flexo
 
 
 		@Override
-		public CSVDocument getDocument() throws ResourceLoadingCancelledException, FlexoException, FileNotFoundException {
+		public CSVDocument getDocument() throws ResourceLoadingCancelledException, OpenflexoRuntimeException, FileNotFoundException {
 			// If this is already a document, return self
 			if (this instanceof CSVDocument) {
 				return (CSVDocument) this;

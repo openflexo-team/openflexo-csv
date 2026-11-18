@@ -42,7 +42,7 @@ import java.lang.reflect.Type;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.openflexo.foundation.FlexoException;
+import org.openflexo.foundation.OpenflexoRuntimeException;
 import org.openflexo.foundation.fml.annotations.FML;
 import org.openflexo.foundation.fml.editionaction.AbstractCreateResource;
 import org.openflexo.foundation.fml.editionaction.EditionAction;
@@ -113,7 +113,7 @@ public interface CreateCSVResource extends AbstractCreateResource<CSVModelSlot, 
                 throw new FMLInternalError(e);
             } catch (ResourceLoadingCancelledException e) {
                 throw new FMLCancellation("Loading of the new CSV document was cancelled", e);
-            } catch (FileNotFoundException | FlexoException e) {
+            } catch (FileNotFoundException | OpenflexoRuntimeException e) {
                 throw new FMLTechnologyError("Cannot create the CSV resource " + resourceName + ": " + e.getMessage(), e);
             }
         }

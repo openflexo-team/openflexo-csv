@@ -43,7 +43,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.openflexo.foundation.FlexoException;
+import org.openflexo.foundation.OpenflexoRuntimeException;
 import org.openflexo.foundation.IOFlexoException;
 import org.openflexo.foundation.resource.FileIODelegate;
 import org.openflexo.foundation.resource.FileWritingLock;
@@ -382,7 +382,7 @@ public abstract class CSVResourceImpl extends PamelaResourceImpl<CSVDocument, CS
 				logger.warning("File not found: " + e.getMessage());
 			}
 			return null;
-		} catch (FlexoException e) {
+		} catch (OpenflexoRuntimeException e) {
 			if (logger.isLoggable(Level.WARNING)) {
 				logger.warning("Error getting CSV document: " + e.getMessage());
 			}
